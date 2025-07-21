@@ -12,9 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEUCES_2190 }}
-          channelId: live
-          projectId: deuces-2190
+   - uses: actions/checkout@v4
+- run: npm install        # <-- Add this line
+- run: npm run build
+- uses: FirebaseExtended/action-hosting-deploy@v0
+  with:
+    repoToken: ${{ secrets.GITHUB_TOKEN }}
+    firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEUCES_2190 }}
+    channelId: live
+    projectId: deuces-2190
