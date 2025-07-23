@@ -162,7 +162,98 @@
             <div id="module-lesson-plans" class="module-section" style="display:none"><h2>Lesson Plans Module</h2></div>
             <div id="module-tests" class="module-section" style="display:none"><h2>Tests Module</h2></div>
             <div id="module-homework" class="module-section" style="display:none"><h2>Homework Module</h2></div>
-            <div id="module-finance" class="module-section" style="display:none"><h2>Finance Module</h2></div>
+            <div id="module-finance" class="module-section" style="display:none">
+              <div class="card shadow-lg border-0 animate-fade-in" style="background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                      <h2 class="mb-0"><i class="bi bi-cash-stack me-2 text-success"></i>Finance Module</h2>
+                      <small class="text-muted">Manage school finances, payments, and reports</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-success" id="finance-add-payment"><i class="bi bi-plus-circle me-1"></i>Add Payment</button>
+                      <button class="btn btn-outline-primary" id="finance-generate-report"><i class="bi bi-bar-chart-line me-1"></i>Generate Report</button>
+                      <button class="btn btn-warning" id="finance-send-reminder"><i class="bi bi-envelope-exclamation me-1"></i>Send Reminder</button>
+                    </div>
+                  </div>
+                  <ul class="nav nav-tabs mb-3" id="financeTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link active" id="finance-overview-tab" data-bs-toggle="tab" data-bs-target="#finance-overview" type="button" role="tab">Overview</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="finance-transactions-tab" data-bs-toggle="tab" data-bs-target="#finance-transactions" type="button" role="tab">Transactions</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="finance-reports-tab" data-bs-toggle="tab" data-bs-target="#finance-reports" type="button" role="tab">Reports</button>
+                    </li>
+                  </ul>
+                  <div class="tab-content" id="financeTabContent">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane fade show active" id="finance-overview" role="tabpanel">
+                      <div class="row g-4 mb-3">
+                        <div class="col-md-4">
+                          <div class="p-3 bg-white rounded shadow-sm text-center">
+                            <div class="fs-2 text-success"><i class="bi bi-wallet2"></i></div>
+                            <div class="fw-bold fs-5">₦<span id="finance-total-balance">0</span></div>
+                            <div class="text-muted">Total Balance</div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="p-3 bg-white rounded shadow-sm text-center">
+                            <div class="fs-2 text-warning"><i class="bi bi-exclamation-circle"></i></div>
+                            <div class="fw-bold fs-5">₦<span id="finance-pending-fees">0</span></div>
+                            <div class="text-muted">Pending Fees</div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="p-3 bg-white rounded shadow-sm text-center">
+                            <div class="fs-2 text-info"><i class="bi bi-credit-card-2-front"></i></div>
+                            <div class="fw-bold fs-5" id="finance-payroll-status">OK</div>
+                            <div class="text-muted">Payroll Status</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="bg-white rounded shadow-sm p-4 mb-3">
+                        <h5 class="mb-3"><i class="bi bi-graph-up-arrow me-2"></i>Fee Collection Trend</h5>
+                        <canvas id="finance-fee-chart" height="100"></canvas>
+                      </div>
+                    </div>
+                    <!-- Transactions Tab -->
+                    <div class="tab-pane fade" id="finance-transactions" role="tabpanel">
+                      <div class="bg-white rounded shadow-sm p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Transaction History</h5>
+                          <input type="text" class="form-control w-auto" id="finance-transaction-search" placeholder="Search..." style="max-width:200px;">
+                        </div>
+                        <div class="table-responsive">
+                          <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                              <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                              </tr>
+                            </thead>
+                            <tbody id="finance-transaction-table">
+                              <!-- Transactions will be dynamically inserted here -->
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Reports Tab -->
+                    <div class="tab-pane fade" id="finance-reports" role="tabpanel">
+                      <div class="bg-white rounded shadow-sm p-4 mb-3">
+                        <h5 class="mb-3"><i class="bi bi-file-earmark-bar-graph me-2"></i>Finance Reports</h5>
+                        <div class="alert alert-info">Report generation and export features coming soon!</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div id="module-inventory" class="module-section" style="display:none"><h2>Inventory Module</h2></div>
             <div id="module-transport" class="module-section" style="display:none"><h2>Transport Module</h2></div>
             <div id="module-alerts" class="module-section" style="display:none"><h2>Alerts Module</h2></div>

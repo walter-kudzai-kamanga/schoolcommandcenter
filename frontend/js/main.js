@@ -1747,478 +1747,227 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Finance & Fees UI ---
     function renderFinanceFees() {
         setMainContent(`
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Finance & Fees</h2>
-                <div class="d-flex align-items-center gap-2">
-                    <label class="me-2">Currency:</label>
-                    <select class="form-select form-select-sm w-auto" id="currencySelector">
-                        <option value="usd">USD</option>
-                        <option value="zig">Zig</option>
-                        <option value="both" selected>Both</option>
-                    </select>
-                    <label class="ms-3 me-2">1 USD =</label>
-                    <input type="number" class="form-control form-control-sm w-auto" id="usdToZigInput" value="${usdToZig}" min="1">
-                    <span class="ms-1">Zig</span>
-                </div>
-                <button class="btn btn-primary" id="addPaymentBtn"><i class="bi bi-plus-circle me-2"></i>Add Payment</button>
+      <div class="card shadow-lg border-0 animate-fade-in" style="background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h2 class="mb-0"><i class="bi bi-cash-stack me-2 text-success"></i>Finance Module</h2>
+              <small class="text-muted">Manage school finances, payments, and reports</small>
             </div>
-            <!-- Term Fee Setting UI -->
-            <div class="card mb-4 animate-fade-in">
-                <div class="card-header bg-light"><i class="bi bi-cash-coin me-2"></i>Set Term Fee</div>
-                <div class="card-body">
-                    <form id="termFeeForm" class="row g-2 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label">Class</label>
-                            <input type="text" class="form-control" id="termFeeClass" placeholder="e.g. JSS1A" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Term</label>
-                            <select class="form-select" id="termFeeTerm" required>
-                                <option value="1st">1st Term</option>
-                                <option value="2nd">2nd Term</option>
-                                <option value="3rd">3rd Term</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Amount</label>
-                            <input type="number" class="form-control" id="termFeeAmount" min="0" required>
-                        </div>
-                        <div class="col-md-1 d-grid">
-                            <button type="submit" class="btn btn-success">Save</button>
-                        </div>
-                    </form>
-                    <div id="termFeeMsg" class="mt-2"></div>
-                </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-success" id="finance-add-payment"><i class="bi bi-plus-circle me-1"></i>Add Payment</button>
+              <button class="btn btn-outline-primary" id="finance-generate-report"><i class="bi bi-bar-chart-line me-1"></i>Generate Report</button>
+              <button class="btn btn-warning" id="finance-send-reminder"><i class="bi bi-envelope-exclamation me-1"></i>Send Reminder</button>
             </div>
-            <div class="row g-4 mb-4">
-                <div class="col-md-3">
-                    <div class="card dashboard-card animate-fade-in text-center bg-light">
-                        <div class="card-body">
-                            <div class="fs-2 fw-bold text-success" id="finance-total-paid">₦0</div>
-                            <div>Paid</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card dashboard-card animate-fade-in text-center bg-light">
-                        <div class="card-body">
-                            <div class="fs-2 fw-bold text-danger" id="finance-total-due">₦0</div>
-                            <div>Unpaid</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card dashboard-card animate-fade-in text-center bg-light">
-                        <div class="card-body">
-                            <div class="fs-2 fw-bold text-warning" id="finance-total-overdue">₦0</div>
-                            <div>Overdue</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card dashboard-card animate-fade-in text-center bg-light">
-                        <div class="card-body">
-                            <div class="fs-2 fw-bold text-info" id="finance-payroll-status">OK</div>
-                            <div>Payroll Status</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="card dashboard-card animate-fade-in">
-                        <div class="card-header"><i class="bi bi-bar-chart-fill me-2"></i>Collections & Balances</div>
-                        <div class="card-body">
-                            <canvas id="financeChart" height="120"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card dashboard-card animate-fade-in">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-cash-stack me-2"></i>Fee Structure</span>
-                            <button class="btn btn-outline-secondary btn-sm" id="editFeeStructureBtn"><i class="bi bi-pencil"></i> Edit</button>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-sm align-middle" id="feeStructureTable">
-                                    <thead class="table-light">
-                                        <tr><th>Class</th><th>Term</th><th>Amount</th></tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card mb-4 animate-fade-in">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-people-fill me-2"></i>Student Fee Records</span>
-                    <div>
-                        <button class="btn btn-outline-secondary btn-sm me-2" id="exportFinanceCSV"><i class="bi bi-file-earmark-spreadsheet me-1"></i>Export CSV</button>
-                        <button class="btn btn-outline-secondary btn-sm" id="sendFeeReminders"><i class="bi bi-bell me-1"></i>Send Reminders</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <input type="text" class="form-control table-search mb-3" placeholder="Search students..." id="financeStudentSearch">
-                    <div class="table-responsive">
-                        <table class="table table-striped align-middle" id="financeStudentsTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Class</th>
-                                    <th>Total</th>
-                                    <th>Paid</th>
-                                    <th>Due</th>
-                                    <th>Due Breakdown</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- Modal for Add/Edit Payment -->
-            <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="paymentModalLabel">Add Payment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <ul class="nav nav-tabs mb-3" id="financeTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="finance-overview-tab" data-bs-toggle="tab" data-bs-target="#finance-overview" type="button" role="tab">Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="finance-transactions-tab" data-bs-toggle="tab" data-bs-target="#finance-transactions" type="button" role="tab">Transactions</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="finance-reports-tab" data-bs-toggle="tab" data-bs-target="#finance-reports" type="button" role="tab">Reports</button>
+            </li>
+          </ul>
+          <div class="tab-content" id="financeTabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="finance-overview" role="tabpanel">
+              <div class="row g-4 mb-3">
+                <div class="col-md-4">
+                  <div class="p-3 bg-white rounded shadow-sm text-center">
+                    <div class="fs-2 text-success"><i class="bi bi-wallet2"></i></div>
+                    <div class="fw-bold fs-5">₦<span id="finance-total-balance">0</span></div>
+                    <div class="text-muted">Total Balance</div>
                   </div>
-                  <div class="modal-body">
-                    <form id="paymentForm">
-                      <div class="mb-3">
-                        <label class="form-label">Student</label>
-                        <select class="form-select" id="paymentStudent" required>
-                          ${financeStudents.map(s=>`<option value="${s.id}">${s.name} (${s.class})</option>`).join('')}
-                        </select>
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label">Amount</label>
-                        <input type="number" class="form-control" id="paymentAmount" min="1" required>
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label">Method</label>
-                        <select class="form-select" id="paymentMethod">
-                          <option value="Cash">Cash</option>
-                          <option value="Transfer">Transfer</option>
-                          <option value="POS">POS</option>
-                        </select>
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label">Date</label>
-                        <input type="date" class="form-control" id="paymentDate" value="${new Date().toISOString().slice(0,10)}" required>
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label">Attach Receipt</label>
-                        <input type="file" class="form-control" id="paymentReceipt">
-                      </div>
-                      <button type="submit" class="btn btn-primary w-100">Save</button>
-                    </form>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 bg-white rounded shadow-sm text-center">
+                    <div class="fs-2 text-warning"><i class="bi bi-exclamation-circle"></i></div>
+                    <div class="fw-bold fs-5">₦<span id="finance-pending-fees">0</span></div>
+                    <div class="text-muted">Pending Fees</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 bg-white rounded shadow-sm text-center">
+                    <div class="fs-2 text-info"><i class="bi bi-credit-card-2-front"></i></div>
+                    <div class="fw-bold fs-5" id="finance-payroll-status">OK</div>
+                    <div class="text-muted">Payroll Status</div>
                   </div>
                 </div>
               </div>
+              <div class="bg-white rounded shadow-sm p-4 mb-3">
+                <h5 class="mb-3"><i class="bi bi-graph-up-arrow me-2"></i>Fee Collection Trend</h5>
+                <canvas id="finance-fee-chart" height="100"></canvas>
+              </div>
             </div>
-            <!-- Modal for Fee Structure Edit -->
-            <div class="modal fade" id="feeStructureModal" tabindex="-1" aria-labelledby="feeStructureModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="feeStructureModalLabel">Edit Fee Structure</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <form id="feeStructureForm">
-                      <div id="feeStructureEditRows"></div>
-                      <button type="submit" class="btn btn-primary w-100 mt-3">Save</button>
-                    </form>
-                  </div>
+            <!-- Transactions Tab -->
+            <div class="tab-pane fade" id="finance-transactions" role="tabpanel">
+              <div class="bg-white rounded shadow-sm p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Transaction History</h5>
+                  <input type="text" class="form-control w-auto" id="finance-transaction-search" placeholder="Search..." style="max-width:200px;">
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="finance-transaction-table">
+                      <!-- Transactions will be dynamically inserted here -->
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
-            <!-- Modal for Invoice/Receipt Preview -->
-            <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="invoiceModalLabel">Invoice/Receipt Preview</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Reports Tab -->
+            <div class="tab-pane fade" id="finance-reports" role="tabpanel">
+              <div class="bg-white rounded shadow-sm p-4 mb-3">
+                <h5 class="mb-3"><i class="bi bi-file-earmark-bar-graph me-2"></i>Finance Reports & Analytics</h5>
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded text-center">
+                      <div class="fw-bold fs-5">₦<span id="report-total-paid">0</span></div>
+                      <div class="text-muted">Total Paid</div>
+                    </div>
                   </div>
-                  <div class="modal-body" id="invoiceModalBody"></div>
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded text-center">
+                      <div class="fw-bold fs-5">₦<span id="report-total-due">0</span></div>
+                      <div class="text-muted">Total Due</div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded text-center">
+                      <div class="fw-bold fs-5" id="report-total-transactions">0</div>
+                      <div class="text-muted">Transactions</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold">Total Paid by Class</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="downloadReportChart"><i class="bi bi-download"></i> Download Chart</button>
+                  </div>
+                  <canvas id="report-class-bar-chart" height="120"></canvas>
                 </div>
               </div>
             </div>
-        `);
-        document.getElementById('currencySelector').value = currency;
-        document.getElementById('currencySelector').onchange = function() {
-            currency = this.value;
-            renderFinanceWidgets();
-            renderFinanceChart();
-            renderFeeStructureTable();
-            renderFinanceStudentsTable();
-        };
-        document.getElementById('usdToZigInput').onchange = function() {
-            usdToZig = parseInt(this.value);
-            renderFinanceWidgets();
-            renderFinanceChart();
-            renderFeeStructureTable();
-            renderFinanceStudentsTable();
-        };
-        // --- Term Fee Form Handler ---
-        document.getElementById('termFeeForm').onsubmit = function(e) {
-            e.preventDefault();
-            const className = document.getElementById('termFeeClass').value.trim();
-            const term = document.getElementById('termFeeTerm').value;
-            const amount = parseInt(document.getElementById('termFeeAmount').value);
-            if (!className || !term || isNaN(amount)) {
-                document.getElementById('termFeeMsg').innerHTML = '<span class="text-danger">Please fill all fields.</span>';
-                return;
-            }
-            // Check if entry exists
-            let existing = financeFeeStructure.find(f => f.class === className && f.term === term);
-            if (existing) {
-                existing.amount = amount;
-                document.getElementById('termFeeMsg').innerHTML = `<span class="text-success">Fee updated for ${className} (${term} Term).</span>`;
-            } else {
-                financeFeeStructure.push({ class: className, term: term, amount: amount });
-                document.getElementById('termFeeMsg').innerHTML = `<span class="text-success">Fee set for ${className} (${term} Term).</span>`;
-            }
-            // Update students' due and total for this class
-            financeStudents.forEach(s => {
-                if (s.class === className) {
-                    if (!s.duesByTerm) s.duesByTerm = { '1st': 0, '2nd': 0, '3rd': 0 };
-                    s.duesByTerm[term] = (s.duesByTerm[term] || 0) + amount;
-                    // Recalculate total and due
-                    s.total = Object.values(s.duesByTerm).reduce((a, b) => a + b, 0);
-                    s.due = s.total - (s.paid || 0);
-                    if (!s.status || s.due > 0) {
-                        s.status = s.paid >= s.total ? 'Paid' : (s.paid > 0 ? 'Partial' : 'Unpaid');
-                    }
-                }
-            });
-            renderFeeStructureTable();
-            renderFinanceStudentsTable();
-        };
-        renderFinanceWidgets();
-        renderFinanceChart();
-        renderFeeStructureTable();
-        renderFinanceStudentsTable();
-        document.getElementById('addPaymentBtn').onclick = openAddPaymentModal;
-        document.getElementById('editFeeStructureBtn').onclick = openEditFeeStructureModal;
-        document.getElementById('exportFinanceCSV').onclick = () => showToast('CSV export coming soon!', 'info');
-        document.getElementById('sendFeeReminders').onclick = () => showToast('Reminders coming soon!', 'info');
-    }
+          </div>
+        </div>
+      </div>
+    `);
 
-    function formatCurrency(usd) {
-        if (currency === 'usd') return `$${usd.toLocaleString()}`;
-        if (currency === 'zig') return `${(usd*usdToZig).toLocaleString()} Zig`;
-        return `$${usd.toLocaleString()} (${(usd*usdToZig).toLocaleString()} Zig)`;
-    }
-
-    function renderFinanceWidgets() {
-        const paid = financeStudents.reduce((a,b)=>a+b.paid,0);
-        const due = financeStudents.reduce((a,b)=>a+b.due,0);
-        const overdue = financeStudents.filter(s=>s.due>0).reduce((a,b)=>a+b.due,0);
-        const payrollOK = financePayroll.every(p=>p.status==='Paid');
-        document.getElementById('finance-total-paid').textContent = formatCurrency(paid);
-        document.getElementById('finance-total-due').textContent = formatCurrency(due);
-        document.getElementById('finance-total-overdue').textContent = formatCurrency(overdue);
+        // --- Tab switching (Bootstrap handles most, but we can add custom logic if needed) ---
+        // --- Overview Tab: Populate summary and chart ---
+        const totalBalance = financeStudents.reduce((a, s) => a + (s.paid || 0), 0);
+        const pendingFees = financeStudents.reduce((a, s) => a + (s.due || 0), 0);
+        const payrollOK = financePayroll.every(p => p.status === 'Paid');
+        document.getElementById('finance-total-balance').textContent = totalBalance.toLocaleString();
+        document.getElementById('finance-pending-fees').textContent = pendingFees.toLocaleString();
         document.getElementById('finance-payroll-status').textContent = payrollOK ? 'OK' : 'Pending';
-    }
 
-    function renderFinanceChart() {
-        const ctx = document.getElementById('financeChart').getContext('2d');
-        if (window.financeChartInstance) window.financeChartInstance.destroy();
-        window.financeChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: financeStudents.map(s=>s.name),
-                datasets: [
-                    { label: 'Paid', data: financeStudents.map(s=>currency==='zig'?s.paid*usdToZig:s.paid), backgroundColor: '#198754' },
-                    { label: 'Due', data: financeStudents.map(s=>currency==='zig'?s.due*usdToZig:s.due), backgroundColor: '#dc3545' }
-                ]
-            },
-            options: { responsive: true, plugins: { legend: { position: 'top' } },
-                scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return formatCurrency(currency==='zig'?value/usdToZig:value); } } } } }
+        // Chart.js: Fee Collection Trend
+        if (window.financeFeeChartInstance) window.financeFeeChartInstance.destroy();
+        const ctxOverview = document.getElementById('finance-fee-chart').getContext('2d');
+        window.financeFeeChartInstance = new Chart(ctxOverview, {
+          type: 'line',
+          data: {
+            labels: financeStudents.map(s => s.name),
+            datasets: [
+              { label: 'Paid', data: financeStudents.map(s => s.paid), borderColor: '#198754', backgroundColor: 'rgba(25,135,84,0.1)', tension: 0.4 },
+              { label: 'Due', data: financeStudents.map(s => s.due), borderColor: '#ffc107', backgroundColor: 'rgba(255,193,7,0.1)', tension: 0.4 }
+            ]
+          },
+          options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
         });
-    }
 
-    function renderFeeStructureTable() {
-        const tbody = document.getElementById('feeStructureTable').querySelector('tbody');
-        tbody.innerHTML = '';
-        financeFeeStructure.forEach(row => {
-            tbody.innerHTML += `<tr><td>${row.class}</td><td>${row.term}</td><td>${formatCurrency(row.amount)}</td></tr>`;
-        });
-    }
-
-    function renderFinanceStudentsTable() {
-        const tbody = document.querySelector('#financeStudentsTable tbody');
-        tbody.innerHTML = '';
-        let filtered = financeStudents.filter(s => {
-            const search = document.getElementById('financeStudentSearch').value.toLowerCase();
-            return s.name.toLowerCase().includes(search) || s.class.toLowerCase().includes(search);
-        });
-        filtered.forEach((s, idx) => {
-            let statusBadge = s.status === 'Paid' ? 'bg-success' : s.status === 'Partial' ? 'bg-warning text-dark' : 'bg-danger';
-            // Build due breakdown string
-            let dueBreakdown = Object.entries(s.duesByTerm || { '1st': 0, '2nd': 0, '3rd': 0 })
-                .filter(([term, amt]) => amt > 0)
-                .map(([term, amt]) => `${term}: ${formatCurrency(amt)}`)
-                .join(', ');
+        // --- Transactions Tab: Populate table ---
+        function renderFinanceTransactionsTable() {
+          const tbody = document.getElementById('finance-transaction-table');
+          const search = (document.getElementById('finance-transaction-search')?.value || '').toLowerCase();
+          tbody.innerHTML = '';
+          financeTransactions.filter(t => {
+            return (
+              t.student.toLowerCase().includes(search) ||
+              t.class.toLowerCase().includes(search) ||
+              t.method.toLowerCase().includes(search) ||
+              t.status.toLowerCase().includes(search)
+            );
+          }).forEach(t => {
             tbody.innerHTML += `
-                <tr>
-                    <td>${s.name}</td>
-                    <td>${s.class}</td>
-                    <td>${formatCurrency(s.total)}</td>
-                    <td>${formatCurrency(s.paid)}</td>
-                    <td>${formatCurrency(s.due)}</td>
-                    <td>${dueBreakdown}</td>
-                    <td><span class="badge ${statusBadge}">${s.status}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="window.viewFinanceHistory(${s.id})"><i class="bi bi-clock-history"></i></button>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="window.openInvoiceModal(${s.id})"><i class="bi bi-file-earmark-text"></i></button>
-                        <button class="btn btn-sm btn-outline-success me-1" onclick="window.openAddPaymentModal(${s.id})"><i class="bi bi-plus-circle"></i></button>
-                        <button class="btn btn-sm btn-outline-info" onclick="window.payFees(${s.id})"><i class="bi bi-credit-card"></i> Pay Fees</button>
-                    </td>
-                </tr>
+              <tr>
+                <td>${t.date}</td>
+                <td>${t.method}</td>
+                <td>₦${t.amount.toLocaleString()}</td>
+                <td><span class="badge ${t.status === 'Completed' ? 'bg-success' : 'bg-warning text-dark'}">${t.status}</span></td>
+                <td><button class="btn btn-sm btn-outline-primary" onclick="window.viewTransaction(${t.id})"><i class="bi bi-eye"></i></button></td>
+              </tr>
             `;
+          });
+        }
+        renderFinanceTransactionsTable();
+        document.getElementById('finance-transaction-search').oninput = renderFinanceTransactionsTable;
+
+        // --- Quick Actions ---
+        document.getElementById('finance-add-payment').onclick = function() {
+          // Show Add Payment Modal
+          showAddPaymentModal();
+        };
+        document.getElementById('finance-generate-report').onclick = function() {
+          showFinanceReportModal();
+        };
+        document.getElementById('finance-send-reminder').onclick = function() {
+          showToast('Reminders coming soon!', 'info');
+        };
+
+        // --- Transaction View Modal (micro-interaction) ---
+        window.viewTransaction = function(id) {
+          const t = financeTransactions.find(x => x.id === id);
+          showToast(`<b>Transaction:</b><br>Date: ${t.date}<br>Student: ${t.student}<br>Class: ${t.class}<br>Amount: ₦${t.amount.toLocaleString()}<br>Method: ${t.method}<br>Status: ${t.status}`, 'info');
+        };
+
+        // --- Reports Tab: Summary Stats ---
+        document.getElementById('report-total-paid').textContent = financeStudents.reduce((a,s)=>a+(s.paid||0),0).toLocaleString();
+        document.getElementById('report-total-due').textContent = financeStudents.reduce((a,s)=>a+(s.due||0),0).toLocaleString();
+        document.getElementById('report-total-transactions').textContent = financeTransactions.length;
+        // Bar chart: total paid by class
+        const classTotals = {};
+        financeStudents.forEach(s => {
+          if (!classTotals[s.class]) classTotals[s.class] = 0;
+          classTotals[s.class] += s.paid || 0;
         });
-        document.getElementById('financeStudentSearch').oninput = renderFinanceStudentsTable;
-    }
-
-    // --- Add/Edit Payment Modal ---
-    window.openAddPaymentModal = function(studentId) {
-        document.getElementById('paymentModalLabel').textContent = 'Add Payment';
-        if (studentId) document.getElementById('paymentStudent').value = studentId;
-        document.getElementById('paymentAmount').value = '';
-        document.getElementById('paymentMethod').value = 'Cash';
-        document.getElementById('paymentDate').value = new Date().toISOString().slice(0,10);
-        document.getElementById('paymentReceipt').value = '';
-        const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
-        modal.show();
-        document.getElementById('paymentForm').onsubmit = function(e) {
-            e.preventDefault();
-            const studentId = parseInt(document.getElementById('paymentStudent').value);
-            const amount = parseFloat(document.getElementById('paymentAmount').value);
-            const method = document.getElementById('paymentMethod').value;
-            const date = document.getElementById('paymentDate').value;
-            // File upload UI only
-            const student = financeStudents.find(s=>s.id===studentId);
-            student.paid += amount;
-            student.due -= amount;
-            student.status = student.due <= 0 ? 'Paid' : 'Partial';
-            student.history.push({ date, amount, method, receipt: '#' });
-            showToast('Payment recorded', 'success');
-            modal.hide();
-            renderFinanceWidgets();
-            renderFinanceChart();
-            renderFinanceStudentsTable();
+        const ctxReports = document.getElementById('report-class-bar-chart').getContext('2d');
+        if (window.reportClassBarChartInstance) window.reportClassBarChartInstance.destroy();
+        window.reportClassBarChartInstance = new Chart(ctxReports, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(classTotals),
+            datasets: [{
+              label: 'Total Paid',
+              data: Object.values(classTotals),
+              backgroundColor: '#0d6efd'
+            }]
+          },
+          options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+        document.getElementById('downloadReportChart').onclick = function() {
+          const url = window.reportClassBarChartInstance.toBase64Image();
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'finance_report_chart.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('Chart downloaded', 'success');
         };
-    }
-
-    // --- Fee Structure Edit Modal ---
-    function openEditFeeStructureModal() {
-        document.getElementById('feeStructureModalLabel').textContent = 'Edit Fee Structure';
-        const rows = financeFeeStructure.map((row, idx) => `
-            <div class="row g-2 mb-2">
-                <div class="col-4"><input type="text" class="form-control" value="${row.class}" data-idx="${idx}" data-field="class"></div>
-                <div class="col-4"><input type="text" class="form-control" value="${row.term}" data-idx="${idx}" data-field="term"></div>
-                <div class="col-4"><input type="number" class="form-control" value="${row.amount}" data-idx="${idx}" data-field="amount"></div>
-            </div>
-        `).join('');
-        document.getElementById('feeStructureEditRows').innerHTML = rows;
-        const modal = new bootstrap.Modal(document.getElementById('feeStructureModal'));
-        modal.show();
-        document.getElementById('feeStructureForm').onsubmit = function(e) {
-            e.preventDefault();
-            Array.from(document.querySelectorAll('#feeStructureEditRows input')).forEach(inp => {
-                const idx = parseInt(inp.getAttribute('data-idx'));
-                const field = inp.getAttribute('data-field');
-                financeFeeStructure[idx][field] = field === 'amount' ? parseInt(inp.value) : inp.value;
-            });
-            showToast('Fee structure updated', 'success');
-            modal.hide();
-            renderFeeStructureTable();
-        };
-    }
-
-    // --- Invoice/Receipt Preview Modal ---
-    window.openInvoiceModal = function(studentId) {
-        const student = financeStudents.find(s=>s.id===studentId);
-        const body = document.getElementById('invoiceModalBody');
-        body.innerHTML = `
-            <h4>Invoice/Receipt</h4>
-            <div><b>Name:</b> ${student.name}</div>
-            <div><b>Class:</b> ${student.class}</div>
-            <div><b>Total:</b> ₦${student.total.toLocaleString()}</div>
-            <div><b>Paid:</b> ₦${student.paid.toLocaleString()}</div>
-            <div><b>Due:</b> ₦${student.due.toLocaleString()}</div>
-            <div class="mt-3"><b>Payment History:</b></div>
-            <ul>${student.history.map(h=>`<li>${h.date}: ₦${h.amount.toLocaleString()} (${h.method})</li>`).join('')}</ul>
-            <div class="mt-3"><button class="btn btn-outline-primary">Download PDF</button></div>
-        `;
-        const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
-        modal.show();
-    }
-    // --- View Payment History ---
-    window.viewFinanceHistory = function(studentId) {
-        const student = financeStudents.find(s=>s.id===studentId);
-        showToast(`Payment history for ${student.name}:<br>${student.history.map(h=>`${h.date}: ₦${h.amount.toLocaleString()} (${h.method})`).join('<br>')}`,'info');
-    }
-
-    // --- Pay Fees Modal & Receipt Generation ---
-    window.payFees = function(studentId) {
-        const student = financeStudents.find(s=>s.id===studentId);
-        document.getElementById('paymentModalLabel').textContent = 'Pay Fees';
-        document.getElementById('paymentStudent').value = studentId;
-        document.getElementById('paymentAmount').value = student.due;
-        document.getElementById('paymentMethod').value = 'Cash';
-        document.getElementById('paymentDate').value = new Date().toISOString().slice(0,10);
-        document.getElementById('paymentReceipt').value = '';
-        const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
-        modal.show();
-        document.getElementById('paymentForm').onsubmit = function(e) {
-            e.preventDefault();
-            const amount = parseFloat(document.getElementById('paymentAmount').value);
-            const method = document.getElementById('paymentMethod').value;
-            const date = document.getElementById('paymentDate').value;
-            const receiptNo = 'RCPT-' + Date.now();
-            student.paid += amount;
-            student.due -= amount;
-            student.status = student.due <= 0 ? 'Paid' : 'Partial';
-            const receipt = { date, amount, method, receipt: receiptNo };
-            student.history.push(receipt);
-            showToast('Payment recorded', 'success');
-            modal.hide();
-            renderFinanceWidgets();
-            renderFinanceChart();
-            renderFinanceStudentsTable();
-            showReceiptModal(student, receipt);
-        };
-    }
-
-    function showReceiptModal(student, receipt) {
-        const body = document.getElementById('invoiceModalBody');
-        body.innerHTML = `
-            <div class="text-center mb-3">
-                <h4 class="mb-1">SCHOOL NAME</h4>
-                <div class="mb-2"><i class="bi bi-receipt fs-1 text-primary"></i></div>
-                <h5 class="mb-3">Payment Receipt</h5>
-            </div>
-            <div><b>Receipt No:</b> ${receipt.receipt}</div>
-            <div><b>Name:</b> ${student.name}</div>
-            <div><b>Class:</b> ${student.class}</div>
-            <div><b>Date:</b> ${receipt.date}</div>
-            <div><b>Amount Paid:</b> <span class="text-success">${formatCurrency(receipt.amount)}</span></div>
-            <div><b>Payment Method:</b> ${receipt.method}</div>
-            <div class="mt-3"><button class="btn btn-outline-primary">Download PDF</button></div>
-        `;
-        const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
-        modal.show();
     }
 
     // --- Mock Data for Inventory ---
@@ -3859,5 +3608,206 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebarDarkModeBtn.addEventListener('click', function() {
             toggleDarkMode();
         });
+    }
+
+    // Add after renderFinanceFees function
+    function showAddPaymentModal() {
+      // Create modal HTML if not present
+      let modal = document.getElementById('financeAddPaymentModal');
+      if (!modal) {
+        const modalHtml = `
+          <div class="modal fade" id="financeAddPaymentModal" tabindex="-1" aria-labelledby="financeAddPaymentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="financeAddPaymentModalLabel">Add Payment</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="financeAddPaymentForm">
+                    <div class="mb-3">
+                      <label class="form-label">Student</label>
+                      <select class="form-select" id="financeAddPaymentStudent" required>
+                        ${financeStudents.map(s=>`<option value="${s.id}">${s.name} (${s.class})</option>`).join('')}
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Amount</label>
+                      <input type="number" class="form-control" id="financeAddPaymentAmount" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Method</label>
+                      <select class="form-select" id="financeAddPaymentMethod">
+                        <option value="Cash">Cash</option>
+                        <option value="Transfer">Transfer</option>
+                        <option value="POS">POS</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Date</label>
+                      <input type="date" class="form-control" id="financeAddPaymentDate" value="${new Date().toISOString().slice(0,10)}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Payment</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modal = document.getElementById('financeAddPaymentModal');
+      }
+      // Reset form
+      document.getElementById('financeAddPaymentForm').reset();
+      document.getElementById('financeAddPaymentDate').value = new Date().toISOString().slice(0,10);
+      // Show modal
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+      // Handle form submit
+      document.getElementById('financeAddPaymentForm').onsubmit = function(e) {
+        e.preventDefault();
+        const studentId = parseInt(document.getElementById('financeAddPaymentStudent').value);
+        const amount = parseFloat(document.getElementById('financeAddPaymentAmount').value);
+        const method = document.getElementById('financeAddPaymentMethod').value;
+        const date = document.getElementById('financeAddPaymentDate').value;
+        const student = financeStudents.find(s=>s.id===studentId);
+        if (!student) {
+          showToast('Student not found', 'danger');
+          return;
+        }
+        student.paid += amount;
+        student.due -= amount;
+        if (student.due < 0) student.due = 0;
+        student.status = student.due <= 0 ? 'Paid' : 'Partial';
+        student.history.push({ date, amount, method, receipt: '#' });
+        // Add to transactions
+        financeTransactions.push({
+          id: financeTransactions.length ? Math.max(...financeTransactions.map(t=>t.id))+1 : 1,
+          student: student.name,
+          class: student.class,
+          date,
+          amount: amount * 1000, // Example: convert to Naira
+          method,
+          status: 'Completed'
+        });
+        showToast('Payment recorded', 'success');
+        bsModal.hide();
+        // Refresh UI
+        renderFinanceFees();
+      };
+    }
+
+    // Add after showAddPaymentModal
+    function showFinanceReportModal() {
+      let modal = document.getElementById('financeReportModal');
+      if (!modal) {
+        const modalHtml = `
+          <div class="modal fade" id="financeReportModal" tabindex="-1" aria-labelledby="financeReportModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="financeReportModalLabel">Generate Finance Report</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <button class="btn btn-outline-success w-100 mb-2" id="exportFinanceCSV"><i class="bi bi-file-earmark-spreadsheet me-1"></i>Export Transactions as CSV</button>
+                    <button class="btn btn-outline-primary w-100" id="exportFinancePDF"><i class="bi bi-file-earmark-pdf me-1"></i>Export Summary as PDF</button>
+                  </div>
+                  <div class="alert alert-info">CSV will download all transactions. PDF is a placeholder for now.</div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modal = document.getElementById('financeReportModal');
+      }
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+      document.getElementById('exportFinanceCSV').onclick = function() {
+        exportFinanceTransactionsCSV();
+        bsModal.hide();
+      };
+      document.getElementById('exportFinancePDF').onclick = function() {
+        showToast('PDF export coming soon!', 'info');
+        bsModal.hide();
+      };
+    }
+    function exportFinanceTransactionsCSV() {
+      const header = ['Date','Student','Class','Amount','Method','Status'];
+      const rows = financeTransactions.map(t => [t.date, t.student, t.class, t.amount, t.method, t.status]);
+      let csv = header.join(',') + '\n' + rows.map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'finance_transactions.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('CSV downloaded', 'success');
+    }
+
+    // After renderFinanceFees, add:
+    function renderFinanceReportsTab() {
+      // Summary stats
+      document.getElementById('report-total-paid').textContent = financeStudents.reduce((a,s)=>a+(s.paid||0),0).toLocaleString();
+      document.getElementById('report-total-due').textContent = financeStudents.reduce((a,s)=>a+(s.due||0),0).toLocaleString();
+      document.getElementById('report-total-transactions').textContent = financeTransactions.length;
+      // Bar chart: total paid by class
+      const classTotals = {};
+      financeStudents.forEach(s => {
+        if (!classTotals[s.class]) classTotals[s.class] = 0;
+        classTotals[s.class] += s.paid || 0;
+      });
+      const ctxReports = document.getElementById('report-class-bar-chart').getContext('2d');
+      if (window.reportClassBarChartInstance) window.reportClassBarChartInstance.destroy();
+      window.reportClassBarChartInstance = new Chart(ctxReports, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(classTotals),
+          datasets: [{
+            label: 'Total Paid',
+            data: Object.values(classTotals),
+            backgroundColor: '#0d6efd'
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      });
+      document.getElementById('downloadReportChart').onclick = function() {
+        const url = window.reportClassBarChartInstance.toBase64Image();
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'finance_report_chart.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Chart downloaded', 'success');
+      };
+    }
+
+    // After renderFinanceFees, add:
+    setTimeout(() => {
+      if (document.getElementById('report-class-bar-chart')) {
+        renderFinanceReportsTab();
+      }
+    }, 100);
+
+    // Utility: Confetti animation
+    function launchConfetti() {
+      const colors = ['#0d6efd','#198754','#ffc107','#dc3545','#6f42c1','#fd7e14'];
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      for (let i = 0; i < 32; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random()*100 + 'vw';
+        piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+        piece.style.transform = `rotate(${Math.random()*360}deg)`;
+        piece.style.animationDelay = (Math.random()*0.5) + 's';
+        confetti.appendChild(piece);
+      }
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 1800);
     }
 }); 

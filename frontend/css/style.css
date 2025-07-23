@@ -155,3 +155,91 @@ body.dark-mode .table-search {
 #darkModeToggleSidebar {
   margin-top: 1rem;
 } 
+
+/* --- Modern UI Enhancements for Finance Module and General Use --- */
+
+/* Card hover and active transitions */
+.card, .dashboard-card {
+  transition: box-shadow 0.3s cubic-bezier(.4,2,.6,1), transform 0.2s cubic-bezier(.4,2,.6,1);
+  border-radius: 1.1rem;
+}
+.card:hover, .dashboard-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 1.5px 6px rgba(0,0,0,0.08);
+  transform: translateY(-2px) scale(1.02);
+}
+.card:active, .dashboard-card:active {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transform: scale(0.98);
+}
+
+/* Tab transitions */
+.nav-tabs .nav-link {
+  transition: background 0.2s, color 0.2s;
+  border-radius: 0.7rem 0.7rem 0 0;
+}
+.nav-tabs .nav-link.active {
+  background: linear-gradient(90deg, #e0e7ff 0%, #f8fafc 100%);
+  color: #0d6efd;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+}
+
+/* Button hover/active effects */
+.btn {
+  transition: box-shadow 0.2s, transform 0.15s;
+  border-radius: 0.7rem;
+}
+.btn:hover {
+  box-shadow: 0 4px 16px rgba(13,110,253,0.10);
+  transform: translateY(-1px) scale(1.03);
+}
+.btn:active {
+  box-shadow: 0 1px 4px rgba(13,110,253,0.08);
+  transform: scale(0.97);
+}
+
+/* Modal enhancements */
+.modal-content {
+  border-radius: 1.2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  border: none;
+}
+
+/* Chart fade-in animation */
+canvas {
+  opacity: 0;
+  animation: chartFadeIn 0.7s cubic-bezier(.4,2,.6,1) 0.1s forwards;
+}
+@keyframes chartFadeIn {
+  to { opacity: 1; }
+}
+
+/* Subtle confetti animation for payment success */
+.confetti {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 2000;
+}
+.confetti-piece {
+  position: absolute;
+  width: 10px; height: 18px;
+  border-radius: 3px;
+  opacity: 0.85;
+  animation: confetti-fall 1.2s cubic-bezier(.4,2,.6,1) forwards;
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-40px) rotate(0deg); opacity: 0.7; }
+  80% { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+/* Finance module specific tweaks */
+#module-finance .card, #module-finance .dashboard-card {
+  background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+  border: none;
+}
+#module-finance .btn {
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+} 
