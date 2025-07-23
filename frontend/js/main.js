@@ -1723,12 +1723,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Mock Data for Finance & Fees ---
     let financeStudents = [
-        { id: 1, name: 'John Doe', class: 'JSS1A', total: 20, paid: 15, due: 5, status: 'Partial', duesByTerm: { '1st': 20, '2nd': 0, '3rd': 0 }, history: [
-            { date: '2024-06-01', amount: 10, method: 'Cash', receipt: '#' },
-            { date: '2024-06-10', amount: 5, method: 'Transfer', receipt: '#' }
+        { id: 1, name: 'Tendai Moyo', class: 'Form 1A', total: 120, paid: 80, due: 40, status: 'Partial', duesByTerm: { '1st': 60, '2nd': 60, '3rd': 0 }, history: [
+            { date: '2024-06-01', amount: 40, method: 'Cash', receipt: '#' },
+            { date: '2024-06-10', amount: 40, method: 'Transfer', receipt: '#' }
         ] },
-        { id: 2, name: 'Jane Smith', class: 'JSS2B', total: 18, paid: 18, due: 0, status: 'Paid', duesByTerm: { '1st': 18, '2nd': 0, '3rd': 0 }, history: [
-            { date: '2024-06-05', amount: 18, method: 'POS', receipt: '#' }
+        { id: 2, name: 'Rutendo Chikafu', class: 'Form 2B', total: 100, paid: 100, due: 0, status: 'Paid', duesByTerm: { '1st': 50, '2nd': 50, '3rd': 0 }, history: [
+            { date: '2024-06-05', amount: 100, method: 'POS', receipt: '#' }
+        ] },
+        { id: 3, name: 'Takudzwa Ncube', class: 'Form 3C', total: 150, paid: 60, due: 90, status: 'Partial', duesByTerm: { '1st': 50, '2nd': 50, '3rd': 50 }, history: [
+            { date: '2024-06-03', amount: 60, method: 'Cash', receipt: '#' }
+        ] },
+        { id: 4, name: 'Nyasha Dube', class: 'Upper 6A', total: 200, paid: 0, due: 200, status: 'Unpaid', duesByTerm: { '1st': 100, '2nd': 100, '3rd': 0 }, history: [] },
+        { id: 5, name: 'Kudzai Mlambo', class: 'Form 2A', total: 110, paid: 70, due: 40, status: 'Partial', duesByTerm: { '1st': 60, '2nd': 50, '3rd': 0 }, history: [
+            { date: '2024-06-07', amount: 70, method: 'Transfer', receipt: '#' }
+        ] },
+        { id: 6, name: 'Rufaro Chirwa', class: 'Lower 6B', total: 180, paid: 120, due: 60, status: 'Partial', duesByTerm: { '1st': 60, '2nd': 60, '3rd': 60 }, history: [
+            { date: '2024-06-09', amount: 120, method: 'POS', receipt: '#' }
         ] }
     ];
     let financeFeeStructure = [
@@ -1798,8 +1808,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
               </div>
               <div class="bg-white rounded shadow-sm p-4 mb-3">
-                <h5 class="mb-3"><i class="bi bi-graph-up-arrow me-2"></i>Fee Collection Trend</h5>
-                <canvas id="finance-fee-chart" height="100"></canvas>
+                <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>Students with Due Fees</h5>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                      <tr><th>Name</th><th>Class</th><th>Due Amount</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="due-fees-table"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" id="schoolpay-btn-overview"><i class="bi bi-credit-card"></i> Pay with SchoolPay</button>
               </div>
             </div>
             <!-- Transactions Tab -->
@@ -1824,6 +1844,9 @@ document.addEventListener('DOMContentLoaded', function() {
                       <!-- Transactions will be dynamically inserted here -->
                     </tbody>
                   </table>
+                </div>
+                <div class="d-flex justify-content-end mb-3">
+                  <button class="btn btn-primary" id="schoolpay-btn-transactions"><i class="bi bi-credit-card"></i> Pay with SchoolPay</button>
                 </div>
               </div>
             </div>
@@ -1967,6 +1990,29 @@ document.addEventListener('DOMContentLoaded', function() {
           a.click();
           document.body.removeChild(a);
           showToast('Chart downloaded', 'success');
+        };
+
+        // --- Due Fees Table ---
+        const dueTbody = document.getElementById('due-fees-table');
+        dueTbody.innerHTML = '';
+        financeStudents.filter(s => s.due > 0).forEach(s => {
+          dueTbody.innerHTML += `
+            <tr>
+              <td>${s.name}</td>
+              <td>${s.class}</td>
+              <td><span class="text-danger fw-bold">₦${s.due.toLocaleString()}</span></td>
+              <td>
+                <button class="btn btn-outline-warning btn-sm me-1" onclick="window.sendDueReminder('${s.name}')"><i class="bi bi-bell"></i> Remind</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.payWithSchoolPay(${s.id},${s.due})"><i class="bi bi-credit-card"></i> SchoolPay</button>
+              </td>
+            </tr>
+          `;
+        });
+        window.sendDueReminder = function(name) {
+          showToast(`Reminder sent to ${name}`, 'info');
+        };
+        window.payWithSchoolPay = function(id, amount) {
+          showSchoolPayModal(id, amount);
         };
     }
 
@@ -3810,4 +3856,182 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.appendChild(confetti);
       setTimeout(() => confetti.remove(), 1800);
     }
+
+    // In renderFinanceFees, add a 'Pay with SchoolPay' button to the Overview and Transactions tabs:
+    // In Overview tab, after summary cards:
+    
+    // After showAddPaymentModal, add:
+    function showSchoolPayModal(studentId, amount) {
+      let modal = document.getElementById('schoolPayModal');
+      if (!modal) {
+        const modalHtml = `
+          <div class="modal fade" id="schoolPayModal" tabindex="-1" aria-labelledby="schoolPayModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header bg-primary text-white align-items-center">
+                  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="SchoolPay Logo" width="36" class="me-2 rounded-circle border border-white shadow-sm">
+                  <div>
+                    <h5 class="modal-title mb-0" id="schoolPayModalLabel">SchoolPay <span class="badge bg-success ms-2">SECURE</span></h5>
+                    <small class="text-white-50">Never Before Payment Gateway</small>
+                  </div>
+                  <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="alert alert-primary d-flex align-items-center mb-3"><i class="bi bi-shield-lock-fill me-2"></i> Your payment is protected by SchoolPay Secure™</div>
+                  <form id="schoolPayForm">
+                    <div class="mb-3">
+                      <label class="form-label">Student</label>
+                      <select class="form-select" id="schoolPayStudent" required>
+                        ${financeStudents.map(s=>`<option value="${s.id}">${s.name} (${s.class})</option>`).join('')}
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Amount</label>
+                      <input type="number" class="form-control" id="schoolPayAmount" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Payment Method</label>
+                      <select class="form-select" id="schoolPayMethod">
+                        <option value="Card">Card</option>
+                        <option value="Bank">Bank Transfer</option>
+                        <option value="USSD">USSD</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Date</label>
+                      <input type="date" class="form-control" id="schoolPayDate" value="${new Date().toISOString().slice(0,10)}" required>
+                    </div>
+                    <div class="mb-3 p-2 bg-light rounded border">
+                      <div class="fw-bold mb-1">Payment Summary</div>
+                      <div id="schoolPaySummary"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Pay Now</button>
+                  </form>
+                  <div id="schoolPayProgress" class="text-center mt-4" style="display:none">
+                    <div class="mb-2"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="SchoolPay Mascot" width="48" style="filter: drop-shadow(0 2px 8px #0d6efd33)"></div>
+                    <div class="progress" style="height: 1.5rem;">
+                      <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="schoolPayProgressBar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div class="mt-2 fw-bold" id="schoolPayStatus">Processing payment...</div>
+                  </div>
+                  <div id="schoolPayReceipt" class="mt-4" style="display:none"></div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modal = document.getElementById('schoolPayModal');
+      }
+      // Reset form and UI
+      document.getElementById('schoolPayForm').style.display = '';
+      document.getElementById('schoolPayProgress').style.display = 'none';
+      document.getElementById('schoolPayReceipt').style.display = 'none';
+      document.getElementById('schoolPayForm').reset();
+      document.getElementById('schoolPayDate').value = new Date().toISOString().slice(0,10);
+      // Preselect student and amount if provided
+      if (studentId) document.getElementById('schoolPayStudent').value = studentId;
+      if (amount) document.getElementById('schoolPayAmount').value = amount;
+      // Update payment summary
+      function updateSummary() {
+        const sid = parseInt(document.getElementById('schoolPayStudent').value);
+        const amt = parseFloat(document.getElementById('schoolPayAmount').value) || 0;
+        const student = financeStudents.find(s=>s.id===sid);
+        document.getElementById('schoolPaySummary').innerHTML = `
+          <div><b>Student:</b> ${student ? student.name : ''} (${student ? student.class : ''})</div>
+          <div><b>Amount:</b> ₦${amt.toLocaleString()}</div>
+          <div><b>Method:</b> ${document.getElementById('schoolPayMethod').value}</div>
+          <div><b>Date:</b> ${document.getElementById('schoolPayDate').value}</div>
+        `;
+      }
+      updateSummary();
+      document.getElementById('schoolPayStudent').onchange = updateSummary;
+      document.getElementById('schoolPayAmount').oninput = updateSummary;
+      document.getElementById('schoolPayMethod').onchange = updateSummary;
+      document.getElementById('schoolPayDate').onchange = updateSummary;
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+      document.getElementById('schoolPayForm').onsubmit = function(e) {
+        e.preventDefault();
+        // Start SchoolPay processing
+        document.getElementById('schoolPayForm').style.display = 'none';
+        document.getElementById('schoolPayProgress').style.display = '';
+        document.getElementById('schoolPayStatus').textContent = 'Processing payment...';
+        let progress = 0;
+        const progressBar = document.getElementById('schoolPayProgressBar');
+        progressBar.style.width = '0%';
+        const interval = setInterval(() => {
+          progress += Math.random()*30+10;
+          if (progress > 100) progress = 100;
+          progressBar.style.width = progress + '%';
+          if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+              // Payment success
+              document.getElementById('schoolPayProgress').style.display = 'none';
+              document.getElementById('schoolPayReceipt').style.display = '';
+              // Update records
+              const studentId = parseInt(document.getElementById('schoolPayStudent').value);
+              const amount = parseFloat(document.getElementById('schoolPayAmount').value);
+              const method = document.getElementById('schoolPayMethod').value;
+              const date = document.getElementById('schoolPayDate').value;
+              const student = financeStudents.find(s=>s.id===studentId);
+              if (student) {
+                student.paid += amount;
+                student.due -= amount;
+                if (student.due < 0) student.due = 0;
+                student.status = student.due <= 0 ? 'Paid' : 'Partial';
+                student.history.push({ date, amount, method: 'SchoolPay-'+method, receipt: 'SCHOOLPAY-'+Date.now() });
+                financeTransactions.push({
+                  id: financeTransactions.length ? Math.max(...financeTransactions.map(t=>t.id))+1 : 1,
+                  student: student.name,
+                  class: student.class,
+                  date,
+                  amount: amount * 1000,
+                  method: 'SchoolPay-'+method,
+                  status: 'Completed'
+                });
+              }
+              // Show receipt
+              document.getElementById('schoolPayReceipt').innerHTML = `
+                <div class="text-center">
+                  <div class="mb-2"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="SchoolPay Mascot" width="48"></div>
+                  <h4 class="text-success">Payment Successful!</h4>
+                  <div class="mt-2">Receipt No: <b>SCHOOLPAY-${Date.now()}</b></div>
+                  <div>Student: <b>${student ? student.name : ''}</b></div>
+                  <div>Class: <b>${student ? student.class : ''}</b></div>
+                  <div>Amount: <b>₦${amount.toLocaleString()}</b></div>
+                  <div>Method: <b>SchoolPay-${method}</b></div>
+                  <div>Date: <b>${date}</b></div>
+                  <div class="mt-3"><button class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button></div>
+                </div>
+              `;
+              launchConfetti();
+              renderFinanceFees();
+            }, 800);
+          }
+        }, 400);
+      };
+    }
+
+    // Add event listeners after rendering Finance module:
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.id === 'schoolpay-btn-overview') {
+        showSchoolPayModal();
+      }
+      if (e.target && e.target.id === 'schoolpay-btn-transactions') {
+        showSchoolPayModal();
+      }
+    });
+
+    // Update all currency displays in due fees table, payment summary, and receipts:
+    // Replace ₦ with Z$ and show both Z$ and $ where appropriate, using:
+    function formatZigUsd(amount) {
+      return `Z$${(amount*usdToZig).toLocaleString()} ($${amount.toLocaleString()})`;
+    }
+    // In due fees table:
+    // <td><span class="text-danger fw-bold">₦${s.due.toLocaleString()}</span></td>
+    // becomes:
+    // <td><span class="text-danger fw-bold">${formatZigUsd(s.due)}</span></td>
+    // In payment summary and receipts, use formatZigUsd for all amounts.
+    // In SchoolPay modal, update all amount displays to use formatZigUsd.
 }); 
