@@ -1723,11 +1723,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Mock Data for Finance & Fees ---
     let financeStudents = [
-        { id: 1, name: 'John Doe', class: 'JSS1A', total: 20, paid: 15, due: 5, status: 'Partial', history: [
+        { id: 1, name: 'John Doe', class: 'JSS1A', total: 20, paid: 15, due: 5, status: 'Partial', duesByTerm: { '1st': 20, '2nd': 0, '3rd': 0 }, history: [
             { date: '2024-06-01', amount: 10, method: 'Cash', receipt: '#' },
             { date: '2024-06-10', amount: 5, method: 'Transfer', receipt: '#' }
         ] },
-        { id: 2, name: 'Jane Smith', class: 'JSS2B', total: 18, paid: 18, due: 0, status: 'Paid', history: [
+        { id: 2, name: 'Jane Smith', class: 'JSS2B', total: 18, paid: 18, due: 0, status: 'Paid', duesByTerm: { '1st': 18, '2nd': 0, '3rd': 0 }, history: [
             { date: '2024-06-05', amount: 18, method: 'POS', receipt: '#' }
         ] }
     ];
@@ -1761,6 +1761,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="ms-1">Zig</span>
                 </div>
                 <button class="btn btn-primary" id="addPaymentBtn"><i class="bi bi-plus-circle me-2"></i>Add Payment</button>
+            </div>
+            <!-- Term Fee Setting UI -->
+            <div class="card mb-4 animate-fade-in">
+                <div class="card-header bg-light"><i class="bi bi-cash-coin me-2"></i>Set Term Fee</div>
+                <div class="card-body">
+                    <form id="termFeeForm" class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Class</label>
+                            <input type="text" class="form-control" id="termFeeClass" placeholder="e.g. JSS1A" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Term</label>
+                            <select class="form-select" id="termFeeTerm" required>
+                                <option value="1st">1st Term</option>
+                                <option value="2nd">2nd Term</option>
+                                <option value="3rd">3rd Term</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Amount</label>
+                            <input type="number" class="form-control" id="termFeeAmount" min="0" required>
+                        </div>
+                        <div class="col-md-1 d-grid">
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </div>
+                    </form>
+                    <div id="termFeeMsg" class="mt-2"></div>
+                </div>
             </div>
             <div class="row g-4 mb-4">
                 <div class="col-md-3">
@@ -1843,6 +1871,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <th>Total</th>
                                     <th>Paid</th>
                                     <th>Due</th>
+                                    <th>Due Breakdown</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -1939,6 +1968,41 @@ document.addEventListener('DOMContentLoaded', function() {
             renderFeeStructureTable();
             renderFinanceStudentsTable();
         };
+        // --- Term Fee Form Handler ---
+        document.getElementById('termFeeForm').onsubmit = function(e) {
+            e.preventDefault();
+            const className = document.getElementById('termFeeClass').value.trim();
+            const term = document.getElementById('termFeeTerm').value;
+            const amount = parseInt(document.getElementById('termFeeAmount').value);
+            if (!className || !term || isNaN(amount)) {
+                document.getElementById('termFeeMsg').innerHTML = '<span class="text-danger">Please fill all fields.</span>';
+                return;
+            }
+            // Check if entry exists
+            let existing = financeFeeStructure.find(f => f.class === className && f.term === term);
+            if (existing) {
+                existing.amount = amount;
+                document.getElementById('termFeeMsg').innerHTML = `<span class="text-success">Fee updated for ${className} (${term} Term).</span>`;
+            } else {
+                financeFeeStructure.push({ class: className, term: term, amount: amount });
+                document.getElementById('termFeeMsg').innerHTML = `<span class="text-success">Fee set for ${className} (${term} Term).</span>`;
+            }
+            // Update students' due and total for this class
+            financeStudents.forEach(s => {
+                if (s.class === className) {
+                    if (!s.duesByTerm) s.duesByTerm = { '1st': 0, '2nd': 0, '3rd': 0 };
+                    s.duesByTerm[term] = (s.duesByTerm[term] || 0) + amount;
+                    // Recalculate total and due
+                    s.total = Object.values(s.duesByTerm).reduce((a, b) => a + b, 0);
+                    s.due = s.total - (s.paid || 0);
+                    if (!s.status || s.due > 0) {
+                        s.status = s.paid >= s.total ? 'Paid' : (s.paid > 0 ? 'Partial' : 'Unpaid');
+                    }
+                }
+            });
+            renderFeeStructureTable();
+            renderFinanceStudentsTable();
+        };
         renderFinanceWidgets();
         renderFinanceChart();
         renderFeeStructureTable();
@@ -2000,6 +2064,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         filtered.forEach((s, idx) => {
             let statusBadge = s.status === 'Paid' ? 'bg-success' : s.status === 'Partial' ? 'bg-warning text-dark' : 'bg-danger';
+            // Build due breakdown string
+            let dueBreakdown = Object.entries(s.duesByTerm || { '1st': 0, '2nd': 0, '3rd': 0 })
+                .filter(([term, amt]) => amt > 0)
+                .map(([term, amt]) => `${term}: ${formatCurrency(amt)}`)
+                .join(', ');
             tbody.innerHTML += `
                 <tr>
                     <td>${s.name}</td>
@@ -2007,6 +2076,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${formatCurrency(s.total)}</td>
                     <td>${formatCurrency(s.paid)}</td>
                     <td>${formatCurrency(s.due)}</td>
+                    <td>${dueBreakdown}</td>
                     <td><span class="badge ${statusBadge}">${s.status}</span></td>
                     <td>
                         <button class="btn btn-sm btn-outline-secondary me-1" onclick="window.viewFinanceHistory(${s.id})"><i class="bi bi-clock-history"></i></button>
@@ -3722,5 +3792,72 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
             }
         }
+    }
+
+    const modules = [
+        'students', 'staff', 'attendance', 'lesson-plans', 'tests',
+        'homework', 'finance', 'inventory', 'transport', 'alerts'
+    ];
+
+    function showModule(module) {
+        // Hide dashboard and all modules
+        const dashboard = document.getElementById('enhanced-dashboard');
+        if (dashboard) dashboard.style.display = 'none';
+        modules.forEach(m => {
+            const el = document.getElementById('module-' + m);
+            if (el) el.style.display = 'none';
+        });
+        // Show selected module
+        const selected = document.getElementById('module-' + module);
+        if (selected) selected.style.display = 'block';
+    }
+
+    // Add click listeners for all nav links (navbar and sidebar)
+    modules.forEach(module => {
+        // Navbar link
+        const navLink = document.getElementById('nav-' + module);
+        if (navLink) {
+            navLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loadModuleUI(module);
+                // If sidebar is open, close it
+                const sidebar = document.getElementById('mobileSidebar');
+                if (sidebar && sidebar.classList.contains('show')) {
+                    const offcanvas = bootstrap.Offcanvas.getInstance(sidebar);
+                    if (offcanvas) offcanvas.hide();
+                }
+            });
+        }
+        // Sidebar link
+        const sidebarLink = document.getElementById('sidebar-nav-' + module);
+        if (sidebarLink) {
+            sidebarLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loadModuleUI(module);
+                // If sidebar is open, close it
+                const sidebar = document.getElementById('mobileSidebar');
+                if (sidebar && sidebar.classList.contains('show')) {
+                    const offcanvas = bootstrap.Offcanvas.getInstance(sidebar);
+                    if (offcanvas) offcanvas.hide();
+                }
+            });
+        }
+    });
+
+    // Dark mode toggle logic
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+    }
+    const darkModeBtn = document.getElementById('darkModeToggle');
+    if (darkModeBtn) {
+        darkModeBtn.addEventListener('click', function() {
+            toggleDarkMode();
+        });
+    }
+    const sidebarDarkModeBtn = document.getElementById('sidebar-darkModeToggle');
+    if (sidebarDarkModeBtn) {
+        sidebarDarkModeBtn.addEventListener('click', function() {
+            toggleDarkMode();
+        });
     }
 }); 

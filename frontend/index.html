@@ -9,145 +9,185 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <i class="bi bi-mortarboard-fill me-2 fs-3"></i>
-                Kamanga Primary
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-students"><i class="bi bi-people-fill me-1"></i>Students</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-staff"><i class="bi bi-person-badge-fill me-1"></i>Staff</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-attendance"><i class="bi bi-calendar-check-fill me-1"></i>Attendance</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-lesson-plans"><i class="bi bi-journal-bookmark-fill me-1"></i>Lesson Plans</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-tests"><i class="bi bi-clipboard2-check-fill me-1"></i>Tests</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-homework"><i class="bi bi-book-fill me-1"></i>Homework</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-finance"><i class="bi bi-cash-stack me-1"></i>Finance</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-inventory"><i class="bi bi-box-seam me-1"></i>Inventory</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-transport"><i class="bi bi-bus-front-fill me-1"></i>Transport</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-alerts"><i class="bi bi-bell-fill me-1"></i>Alerts</a></li>
-                    <li class="nav-item ms-3">
-                        <button class="btn btn-outline-light" id="darkModeToggle" title="Toggle dark mode"><i class="bi bi-moon-stars-fill"></i></button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <div class="container mt-5" id="main-content">
-        <div id="enhanced-dashboard">
-            <div class="row g-4 mb-4">
-                <div class="col-6 col-md-3">
-                    <div class="card dashboard-card text-center animate-fade-in">
-                        <div class="card-body">
-                            <i class="bi bi-people-fill fs-1 text-primary"></i>
-                            <h6 class="mt-2">Total Students</h6>
-                            <h3 id="dashboard-total-students">0</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card dashboard-card text-center animate-fade-in">
-                        <div class="card-body">
-                            <i class="bi bi-person-badge-fill fs-1 text-primary"></i>
-                            <h6 class="mt-2">Total Staff</h6>
-                            <h3 id="dashboard-total-staff">0</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card dashboard-card text-center animate-fade-in">
-                        <div class="card-body">
-                            <i class="bi bi-collection-fill fs-1 text-primary"></i>
-                            <h6 class="mt-2">Total Classes</h6>
-                            <h3 id="dashboard-total-classes">0</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card dashboard-card text-center animate-fade-in">
-                        <div class="card-body">
-                            <i class="bi bi-journal-bookmark-fill fs-1 text-primary"></i>
-                            <h6 class="mt-2">Active Lessons</h6>
-                            <h3 id="dashboard-active-lessons">0</h3>
-                        </div>
-                    </div>
+    <div id="app-container" style="">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <i class="bi bi-mortarboard-fill me-2 fs-3"></i>
+                    Kamanga Primary
+                </a>
+                <!-- Sidebar toggler for mobile only -->
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!-- Desktop nav links -->
+                <div class="collapse navbar-collapse d-none d-lg-block" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-students"><i class="bi bi-people-fill me-1"></i>Students</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-staff"><i class="bi bi-person-badge-fill me-1"></i>Staff</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-attendance"><i class="bi bi-calendar-check-fill me-1"></i>Attendance</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-lesson-plans"><i class="bi bi-journal-bookmark-fill me-1"></i>Lesson Plans</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-tests"><i class="bi bi-clipboard2-check-fill me-1"></i>Tests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-homework"><i class="bi bi-book-fill me-1"></i>Homework</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-finance"><i class="bi bi-cash-stack me-1"></i>Finance</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-inventory"><i class="bi bi-box-seam me-1"></i>Inventory</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-transport"><i class="bi bi-bus-front-fill me-1"></i>Transport</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="nav-alerts"><i class="bi bi-bell-fill me-1"></i>Alerts</a></li>
+                        <li class="nav-item ms-3">
+                            <button class="btn btn-outline-light" id="darkModeToggle" title="Toggle dark mode"><i class="bi bi-moon-stars-fill"></i></button>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="row g-4 mb-4">
-                <div class="col-md-4">
-                    <div class="card dashboard-card animate-fade-in">
-                        <div class="card-header bg-warning text-dark"><i class="bi bi-bell-fill me-2"></i>Alerts</div>
-                        <div class="card-body" id="dashboard-alerts-summary">
-                            <ul class="list-group list-group-flush" id="dashboard-alerts-list"></ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card dashboard-card animate-fade-in">
-                        <div class="card-header bg-success text-white"><i class="bi bi-cash-stack me-2"></i>Finance</div>
-                        <div class="card-body" id="dashboard-finance-summary">
-                            <div>Pending Fees: <span class="fw-bold" id="dashboard-pending-fees">₦0</span></div>
-                            <div>Payroll Status: <span class="fw-bold" id="dashboard-payroll-status">OK</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card dashboard-card animate-fade-in">
-                        <div class="card-header bg-info text-white"><i class="bi bi-calendar-check-fill me-2"></i>Attendance</div>
-                        <div class="card-body" id="dashboard-attendance-summary">
-                            <div>Present: <span class="fw-bold" id="dashboard-present">0</span></div>
-                            <div>Absent: <span class="fw-bold" id="dashboard-absent">0</span></div>
-                            <div>Late: <span class="fw-bold" id="dashboard-late">0</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="card dashboard-card animate-fade-in">
-                        <div class="card-header"><i class="bi bi-bar-chart-fill me-2"></i>Analytics</div>
-                        <div class="card-body">
-                            <canvas id="dashboard-analytics-chart" height="120"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card dashboard-card animate-fade-in">
-                        <div class="card-header"><i class="bi bi-clipboard2-data-fill me-2"></i>Quick Actions</div>
-                        <div class="card-body d-flex flex-column gap-2">
-                            <button class="btn btn-primary" id="open-student-management"><i class="bi bi-person-plus-fill me-2"></i>Student Management</button>
-                            <button class="btn btn-secondary" id="open-staff-management"><i class="bi bi-person-badge-fill me-2"></i>Staff Management</button>
-                            <button class="btn btn-success" id="open-attendance"><i class="bi bi-calendar-check-fill me-2"></i>Attendance</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row g-4" id="dashboard-cards" style="display:none"></div>
-    </div>
-    <!-- Modal for table row details -->
-    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="detailsModalLabel">Details</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </nav>
+        <!-- Offcanvas Sidebar for Mobile -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="mobileSidebarLabel">
+              <i class="bi bi-mortarboard-fill me-2"></i>Kamanga Primary
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
-          <div class="modal-body" id="detailsModalBody">
+          <div class="offcanvas-body">
+            <ul class="navbar-nav">
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-students"><i class="bi bi-people-fill me-1"></i>Students</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-staff"><i class="bi bi-person-badge-fill me-1"></i>Staff</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-attendance"><i class="bi bi-calendar-check-fill me-1"></i>Attendance</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-lesson-plans"><i class="bi bi-journal-bookmark-fill me-1"></i>Lesson Plans</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-tests"><i class="bi bi-clipboard2-check-fill me-1"></i>Tests</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-homework"><i class="bi bi-book-fill me-1"></i>Homework</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-finance"><i class="bi bi-cash-stack me-1"></i>Finance</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-inventory"><i class="bi bi-box-seam me-1"></i>Inventory</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-transport"><i class="bi bi-bus-front-fill me-1"></i>Transport</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" id="sidebar-nav-alerts"><i class="bi bi-bell-fill me-1"></i>Alerts</a></li>
+              <li class="nav-item mt-3">
+                <button class="btn btn-outline-primary w-100" id="sidebar-darkModeToggle" title="Toggle dark mode"><i class="bi bi-moon-stars-fill"></i> Dark Mode</button>
+              </li>
+            </ul>
           </div>
         </div>
-      </div>
+        <div class="container mt-5" id="main-content">
+            <div id="enhanced-dashboard">
+                <div class="row g-4 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="card dashboard-card text-center animate-fade-in">
+                            <div class="card-body">
+                                <i class="bi bi-people-fill fs-1 text-primary"></i>
+                                <h6 class="mt-2">Total Students</h6>
+                                <h3 id="dashboard-total-students">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card dashboard-card text-center animate-fade-in">
+                            <div class="card-body">
+                                <i class="bi bi-person-badge-fill fs-1 text-primary"></i>
+                                <h6 class="mt-2">Total Staff</h6>
+                                <h3 id="dashboard-total-staff">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card dashboard-card text-center animate-fade-in">
+                            <div class="card-body">
+                                <i class="bi bi-collection-fill fs-1 text-primary"></i>
+                                <h6 class="mt-2">Total Classes</h6>
+                                <h3 id="dashboard-total-classes">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card dashboard-card text-center animate-fade-in">
+                            <div class="card-body">
+                                <i class="bi bi-journal-bookmark-fill fs-1 text-primary"></i>
+                                <h6 class="mt-2">Active Lessons</h6>
+                                <h3 id="dashboard-active-lessons">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card dashboard-card animate-fade-in">
+                            <div class="card-header bg-warning text-dark"><i class="bi bi-bell-fill me-2"></i>Alerts</div>
+                            <div class="card-body" id="dashboard-alerts-summary">
+                                <ul class="list-group list-group-flush" id="dashboard-alerts-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card dashboard-card animate-fade-in">
+                            <div class="card-header bg-success text-white"><i class="bi bi-cash-stack me-2"></i>Finance</div>
+                            <div class="card-body" id="dashboard-finance-summary">
+                                <div>Pending Fees: <span class="fw-bold" id="dashboard-pending-fees">₦0</span></div>
+                                <div>Payroll Status: <span class="fw-bold" id="dashboard-payroll-status">OK</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card dashboard-card animate-fade-in">
+                            <div class="card-header bg-info text-white"><i class="bi bi-calendar-check-fill me-2"></i>Attendance</div>
+                            <div class="card-body" id="dashboard-attendance-summary">
+                                <div>Present: <span class="fw-bold" id="dashboard-present">0</span></div>
+                                <div>Absent: <span class="fw-bold" id="dashboard-absent">0</span></div>
+                                <div>Late: <span class="fw-bold" id="dashboard-late">0</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="card dashboard-card animate-fade-in">
+                            <div class="card-header"><i class="bi bi-bar-chart-fill me-2"></i>Analytics</div>
+                            <div class="card-body">
+                                <canvas id="dashboard-analytics-chart" height="120"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card dashboard-card animate-fade-in">
+                            <div class="card-header"><i class="bi bi-clipboard2-data-fill me-2"></i>Quick Actions</div>
+                            <div class="card-body d-flex flex-column gap-2">
+                                <button class="btn btn-primary" id="open-student-management"><i class="bi bi-person-plus-fill me-2"></i>Student Management</button>
+                                <button class="btn btn-secondary" id="open-staff-management"><i class="bi bi-person-badge-fill me-2"></i>Staff Management</button>
+                                <button class="btn btn-success" id="open-attendance"><i class="bi bi-calendar-check-fill me-2"></i>Attendance</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="module-students" class="module-section" style="display:none"><h2>Students Module</h2></div>
+            <div id="module-staff" class="module-section" style="display:none"><h2>Staff Module</h2></div>
+            <div id="module-attendance" class="module-section" style="display:none"><h2>Attendance Module</h2></div>
+            <div id="module-lesson-plans" class="module-section" style="display:none"><h2>Lesson Plans Module</h2></div>
+            <div id="module-tests" class="module-section" style="display:none"><h2>Tests Module</h2></div>
+            <div id="module-homework" class="module-section" style="display:none"><h2>Homework Module</h2></div>
+            <div id="module-finance" class="module-section" style="display:none"><h2>Finance Module</h2></div>
+            <div id="module-inventory" class="module-section" style="display:none"><h2>Inventory Module</h2></div>
+            <div id="module-transport" class="module-section" style="display:none"><h2>Transport Module</h2></div>
+            <div id="module-alerts" class="module-section" style="display:none"><h2>Alerts Module</h2></div>
+            <div class="row g-4" id="dashboard-cards" style="display:none"></div>
+        </div>
+        <!-- Modal for table row details -->
+        <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="detailsModalBody">
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Toast container -->
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
+          <div id="toastContainer"></div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        <script src="js/main.js"></script>
     </div>
-    <!-- Toast container -->
-    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">
-      <div id="toastContainer"></div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="js/main.js"></script>
 </body>
 </html> 
