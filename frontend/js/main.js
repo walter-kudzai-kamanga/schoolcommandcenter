@@ -1,3 +1,8 @@
+// Move this to the top, after other global variables:
+let pendingApplicants = [];
+// Add a variable to track pending applications
+let pendingStudentApplications = 0;
+
 document.addEventListener('DOMContentLoaded', function() {
     const mainContent = document.getElementById('main-content');
     const dashboardCards = document.getElementById('dashboard-cards');
@@ -11,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
         { id: 'finance', endpoint: 'finance' },
         { id: 'inventory', endpoint: 'inventory' },
         { id: 'transport', endpoint: 'transport' },
-        { id: 'alerts', endpoint: 'alerts' }
+        { id: 'alerts', endpoint: 'alerts' },
+        { id: 'student-application', endpoint: 'student_application' }
     ];
 
     // --- Dynamic Module Loader ---
@@ -46,6 +52,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             case 'alerts':
                 renderAlertsModule();
+                break;
+            case 'student-application':
+                renderStudentApplicationForm();
                 break;
             default:
                 setMainContent('<div class="text-center mt-5"><h3>Module coming soon!</h3></div>');
@@ -116,6 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
         `);
         renderStudentsTable();
         document.getElementById('addStudentBtn').onclick = openAddStudentModal;
+        // Reset badge and counter
+        pendingStudentApplications = 0;
+        updateSidebarStudentBadge();
     }
 
     // --- Mock Data for Students ---
@@ -1812,7 +1824,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="table-responsive">
                   <table class="table table-sm align-middle mb-0">
                     <thead class="table-light">
-                      <tr><th>Name</th><th>Class</th><th>Due Amount</th><th>Actions</th></tr>
+                      <tr><th>Name</th><th>Class</th><th>Due Amount</th><th>Health Score</th><th>Badges</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="due-fees-table"></tbody>
                   </table>
@@ -1994,13 +2006,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // --- Due Fees Table ---
         const dueTbody = document.getElementById('due-fees-table');
+        let dueStudents = financeStudents.filter(s => s.due > 0);
+        if (dueStudents.length === 0) {
+          dueStudents = [
+            { name: 'Blessing Mutsvairo', class: 'Form 1B', due: 60, id: 101, history: [], status: 'Unpaid' },
+            { name: 'Tatenda Sibanda', class: 'Form 4A', due: 80, id: 102, history: [], status: 'Unpaid' },
+            { name: 'Chipo Mhlanga', class: 'Lower 6C', due: 120, id: 103, history: [], status: 'Unpaid' },
+            { name: 'Tawanda Gondo', class: 'Form 3B', due: 45, id: 104, history: [], status: 'Partial' }
+          ];
+        }
         dueTbody.innerHTML = '';
-        financeStudents.filter(s => s.due > 0).forEach(s => {
+        dueStudents.forEach(s => {
           dueTbody.innerHTML += `
             <tr>
               <td>${s.name}</td>
               <td>${s.class}</td>
-              <td><span class="text-danger fw-bold">₦${s.due.toLocaleString()}</span></td>
+              <td>${formatZigUsd(s.due)}</td>
+              <td>${calculateHealthScore(s)}</td>
+              <td>${getBadges(s).map(b=>`<span class='badge bg-info me-1'>${b}</span>`).join('')}</td>
               <td>
                 <button class="btn btn-outline-warning btn-sm me-1" onclick="window.sendDueReminder('${s.name}')"><i class="bi bi-bell"></i> Remind</button>
                 <button class="btn btn-outline-primary btn-sm" onclick="window.payWithSchoolPay(${s.id},${s.due})"><i class="bi bi-credit-card"></i> SchoolPay</button>
@@ -4034,4 +4057,434 @@ document.addEventListener('DOMContentLoaded', function() {
     // <td><span class="text-danger fw-bold">${formatZigUsd(s.due)}</span></td>
     // In payment summary and receipts, use formatZigUsd for all amounts.
     // In SchoolPay modal, update all amount displays to use formatZigUsd.
+
+    // 1. Add Parental Financial Health Score calculation
+    function calculateHealthScore(student) {
+      // Simple scoring: +50 for on-time, -20 for late, +10 for using digital methods, max 100
+      let score = 50;
+      if (!student.history || student.history.length === 0) return 40;
+      student.history.forEach(h => {
+        if (h.method.includes('Transfer') || h.method.includes('POS') || h.method.includes('SchoolPay')) score += 10;
+        if (h.date < '2024-06-10') score += 10; // Early payment (demo logic)
+        if (h.date > '2024-06-15') score -= 20; // Late payment (demo logic)
+      });
+      if (score > 100) score = 100;
+      if (score < 10) score = 10;
+      return score;
+    }
+    // 2. Add Student Wallet system
+    let studentWallets = {
+      1: { balance: 50, limit: 20, investments: 5 },
+      2: { balance: 0, limit: 0, investments: 0 },
+      3: { balance: 30, limit: 10, investments: 2 },
+      4: { balance: 0, limit: 0, investments: 0 },
+      5: { balance: 15, limit: 5, investments: 1 },
+      6: { balance: 40, limit: 15, investments: 3 }
+    };
+    // 3. Add Gamified Payment Badges
+    function getBadges(student) {
+      let badges = [];
+      if (student.history && student.history.some(h => h.date < '2024-06-10')) badges.push('Early Bird');
+      if (student.history && student.history.length >= 3) badges.push('Consistent Payer');
+      if (student.history && student.history.some(h => h.method.includes('Donation'))) badges.push('Donor');
+      return badges;
+    }
+    document.getElementById('topUpWalletBtn').onclick = function() { showToast('Wallet top-up coming soon!', 'info'); };
+    document.getElementById('investSpareBtn').onclick = function() { showToast('Micro-investment coming soon!', 'info'); };
+
+    // 1. Add pendingApplicants array
+    let pendingApplicants = [];
+    // 2. Add function to render application form
+    function renderStudentApplicationForm() {
+      setMainContent(`
+        <div class="card shadow-lg border-0 animate-fade-in" style="background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);">
+          <div class="card-body">
+            <h2 class="mb-3"><i class="bi bi-file-earmark-person me-2 text-primary"></i>Student Application</h2>
+            <form id="studentApplicationForm" enctype="multipart/form-data">
+              <h4 class="mt-4 mb-3">🧍‍♂️ Student Information</h4>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-control" name="firstName" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Middle Name</label>
+                  <input type="text" class="form-control" name="middleName">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-control" name="lastName" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Date of Birth</label>
+                  <input type="date" class="form-control" name="dob" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Gender</label>
+                  <select class="form-select" name="gender" required>
+                    <option value="">Select</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Nationality</label>
+                  <input type="text" class="form-control" name="nationality" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Religion <span class="text-muted">(optional)</span></label>
+                  <input type="text" class="form-control" name="religion">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Birth Certificate/National ID No.</label>
+                  <input type="text" class="form-control" name="idNumber" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Passport Photo</label>
+                  <input type="file" class="form-control" name="passportPhoto" accept="image/*" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Home/Physical Address</label>
+                  <input type="text" class="form-control" name="address" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Previous School Attended</label>
+                  <input type="text" class="form-control" name="prevSchool">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Current Grade Applying For</label>
+                  <input type="text" class="form-control" name="gradeApplying" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Desired Start Date</label>
+                  <input type="date" class="form-control" name="startDate" required>
+                </div>
+              </div>
+              <h4 class="mt-4 mb-3">👨‍👩‍👧 Parent/Guardian Information</h4>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Full Name(s)</label>
+                  <input type="text" class="form-control" name="parentName" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Relationship to Student</label>
+                  <input type="text" class="form-control" name="relationship" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Contact Number(s)</label>
+                  <input type="text" class="form-control" name="parentContact" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" class="form-control" name="parentEmail">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Residential Address</label>
+                  <input type="text" class="form-control" name="parentAddress" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Occupation & Place of Work</label>
+                  <input type="text" class="form-control" name="parentOccupation">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Marital Status <span class="text-muted">(optional)</span></label>
+                  <input type="text" class="form-control" name="maritalStatus">
+                </div>
+              </div>
+              <h4 class="mt-4 mb-3">🏫 Academic Information</h4>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Previous Academic Records/Transcripts</label>
+                  <input type="file" class="form-control" name="academicRecords" multiple>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Last Grade Completed</label>
+                  <input type="text" class="form-control" name="lastGrade">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Report Cards</label>
+                  <input type="file" class="form-control" name="reportCards" multiple>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Transfer Letter</label>
+                  <input type="file" class="form-control" name="transferLetter">
+                </div>
+              </div>
+              <h4 class="mt-4 mb-3">🏥 Health & Medical Information</h4>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Medical Conditions/Allergies</label>
+                  <input type="text" class="form-control" name="medicalConditions">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Immunization/Vaccination History</label>
+                  <input type="text" class="form-control" name="immunizationHistory">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Doctor's Name & Contact</label>
+                  <input type="text" class="form-control" name="doctorContact">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Medical Aid/Insurance Provider</label>
+                  <input type="text" class="form-control" name="medicalAid">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Policy Number</label>
+                  <input type="text" class="form-control" name="policyNumber">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Emergency Contact (if different)</label>
+                  <input type="text" class="form-control" name="emergencyContact">
+                </div>
+              </div>
+              <h4 class="mt-4 mb-3">📄 Supporting Documents</h4>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Copy of Birth Certificate</label>
+                  <input type="file" class="form-control" name="birthCertificate" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Parent/Guardian ID Copy</label>
+                  <input type="file" class="form-control" name="parentIdCopy" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Proof of Residence</label>
+                  <input type="file" class="form-control" name="proofOfResidence" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Passport-sized Photo</label>
+                  <input type="file" class="form-control" name="passportSizedPhoto" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Previous School Report/Transfer Letter</label>
+                  <input type="file" class="form-control" name="prevSchoolReport">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Medical Certificate (if required)</label>
+                  <input type="file" class="form-control" name="medicalCertificate">
+                </div>
+              </div>
+              <h4 class="mt-4 mb-3">💬 Additional Information</h4>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Preferred Language of Instruction</label>
+                  <input type="text" class="form-control" name="language">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Special Needs/Support Required</label>
+                  <input type="text" class="form-control" name="specialNeeds">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Extra-curricular Interests</label>
+                  <input type="text" class="form-control" name="extraCurricular">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Religious Instruction Preferences</label>
+                  <input type="text" class="form-control" name="religiousInstruction">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Transport Requirements</label>
+                  <input type="text" class="form-control" name="transport">
+                </div>
+              </div>
+              <h4 class="mt-4 mb-3">✅ Declarations & Signatures</h4>
+              <div class="row g-3">
+                <div class="col-md-12">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="declaration" id="declaration" required>
+                    <label class="form-check-label" for="declaration">
+                      I declare that the information provided is correct to the best of my knowledge.
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="agreement" id="agreement" required>
+                    <label class="form-check-label" for="agreement">
+                      I agree to the school rules and code of conduct.
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="consent" id="consent" required>
+                    <label class="form-check-label" for="consent">
+                      I consent to medical treatment and media use (photos/videos) for my child.
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Parent/Guardian Signature</label>
+                  <input type="text" class="form-control" name="parentSignature" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Date</label>
+                  <input type="date" class="form-control" name="parentSignatureDate" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">School Official's Signature (internal use)</label>
+                  <input type="text" class="form-control" name="officialSignature" disabled>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Date (internal use)</label>
+                  <input type="date" class="form-control" name="officialSignatureDate" disabled>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        `);
+        document.getElementById('studentApplicationForm').onsubmit = function(e) {
+            e.preventDefault();
+            showToast('Application submitted! (Demo only, not saved)', 'success');
+            this.reset();
+            pendingStudentApplications++;
+            updateSidebarStudentBadge();
+        };
+    }
+
+    function updateSidebarStudentBadge() {
+        const sidebarNav = document.getElementById('sidebar-nav-students');
+        if (!sidebarNav) return;
+        let badge = sidebarNav.querySelector('.student-app-badge');
+        if (pendingStudentApplications > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'badge bg-danger ms-2 student-app-badge';
+                sidebarNav.appendChild(badge);
+            }
+            badge.textContent = pendingStudentApplications;
+        } else if (badge) {
+            badge.remove();
+        }
+    }
+
+    // When students module is opened, clear the badge
+    function renderStudentManagement() {
+        setMainContent(`
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Student Management</h2>
+                <button class="btn btn-primary" id="addStudentBtn"><i class="bi bi-person-plus-fill me-2"></i>Add Student</button>
+            </div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <input type="text" class="form-control table-search mb-3" placeholder="Search students..." id="studentSearchInput">
+                    <div class="table-responsive animate-fade-in">
+                        <table class="table table-striped align-middle" id="studentsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Reg No</th>
+                                    <th>Name</th>
+                                    <th>Class</th>
+                                    <th>Fees</th>
+                                    <th>Attendance</th>
+                                    <th>Tests</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal for Add/Edit Student -->
+            <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="studentModalLabel">Add Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="studentForm">
+                      <div class="mb-3">
+                        <label for="studentRegNo" class="form-label">Reg No</label>
+                        <input type="text" class="form-control" id="studentRegNo" readonly>
+                      </div>
+                      <div class="mb-3">
+                        <label for="studentName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="studentName" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="studentClass" class="form-label">Class</label>
+                        <input type="text" class="form-control" id="studentClass" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="studentDocs" class="form-label">Attach Documents</label>
+                        <input type="file" class="form-control" id="studentDocs" multiple>
+                        <div class="form-text">Birth certificate, photo, report card, etc.</div>
+                      </div>
+                      <button type="submit" class="btn btn-primary w-100">Save</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+        `);
+        renderStudentsTable();
+        document.getElementById('addStudentBtn').onclick = openAddStudentModal;
+        // Reset badge and counter
+        pendingStudentApplications = 0;
+        updateSidebarStudentBadge();
+    }
+    // ... existing code ...
+
+    document.getElementById('nav-student-application')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      renderStudentApplicationForm();
+    });
+    document.getElementById('sidebar-nav-student-application')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      renderStudentApplicationForm();
+    });
+
+    document.getElementById('nav-students')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      renderStudentManagement();
+    });
+    document.getElementById('sidebar-nav-students')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      renderStudentManagement();
+    });
+    document.getElementById('nav-student-application')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      renderStudentApplicationForm();
+    });
+    document.getElementById('sidebar-nav-student-application')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      renderStudentApplicationForm();
+    });
+
+    // Add sidebar nav event listeners
+    const sidebarNavStudents = document.getElementById('sidebar-nav-students');
+    if (sidebarNavStudents) {
+        sidebarNavStudents.addEventListener('click', function(e) {
+            e.preventDefault();
+            loadModuleUI('students');
+        });
+    }
+
+    // Add sidebar nav event listeners for all modules
+    const sidebarNavMap = {
+        'sidebar-nav-students': 'students',
+        'sidebar-nav-staff': 'staff',
+        'sidebar-nav-attendance': 'attendance',
+        'sidebar-nav-lesson-plans': 'lesson-plans',
+        'sidebar-nav-tests': 'tests',
+        'sidebar-nav-homework': 'homework',
+        'sidebar-nav-finance': 'finance',
+        'sidebar-nav-inventory': 'inventory',
+        'sidebar-nav-transport': 'transport',
+        'sidebar-nav-alerts': 'alerts',
+        'sidebar-nav-student-application': 'student-application'
+    };
+    Object.entries(sidebarNavMap).forEach(([id, moduleKey]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                loadModuleUI(moduleKey);
+            });
+        }
+    });
 }); 

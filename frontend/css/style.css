@@ -243,3 +243,7 @@ canvas {
   font-size: 1.05rem;
   letter-spacing: 0.01em;
 } 
+
+form.animate-fade-in, .card form.animate-fade-in {
+  animation: none !important;
+} 
