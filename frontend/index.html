@@ -158,7 +158,125 @@
                     </div>
                 </div>
             </div>
-            <div id="module-students" class="module-section" style="display:none"><h2>Students Module</h2></div>
+            <div id="module-students" class="module-section" style="display:none">
+              <!-- Students Dashboard Summary -->
+              <div class="row mb-4">
+                <div class="col-md-3 col-6">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <div class="fs-2 text-primary"><i class="bi bi-people-fill"></i></div>
+                      <div class="fw-bold fs-5" id="students-total-count">0</div>
+                      <div class="text-muted">Total Students</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 col-6">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <div class="fs-2 text-info"><i class="bi bi-gender-ambiguous"></i></div>
+                      <div class="fw-bold fs-5" id="students-gender-ratio">-</div>
+                      <div class="text-muted">Gender Ratio</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 col-6">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <div class="fs-2 text-success"><i class="bi bi-collection-fill"></i></div>
+                      <div class="fw-bold fs-5" id="students-class-count">-</div>
+                      <div class="text-muted">Classes</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 col-6">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <div class="fs-2 text-warning"><i class="bi bi-calendar-check-fill"></i></div>
+                      <div class="fw-bold fs-5" id="students-attendance-summary">-</div>
+                      <div class="text-muted">Attendance</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Students Actions -->
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Students</h2>
+                <div>
+                  <button class="btn btn-primary" id="add-student-btn"><i class="bi bi-person-plus-fill me-1"></i>Add Student</button>
+                  <button class="btn btn-outline-secondary" id="import-students-btn"><i class="bi bi-upload me-1"></i>Import</button>
+                  <button class="btn btn-outline-success" id="export-students-btn"><i class="bi bi-download me-1"></i>Export</button>
+                  <button class="btn btn-outline-info" id="bulk-message-btn"><i class="bi bi-envelope-fill me-1"></i>Bulk Message</button>
+                </div>
+              </div>
+              <!-- Search and Filter -->
+              <div class="row mb-3">
+                <div class="col-md-6 mb-2 mb-md-0">
+                  <input type="text" class="form-control" id="student-search" placeholder="Search students by name, ID, or class...">
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                  <select class="form-select" id="student-class-filter">
+                    <option value="">All Classes</option>
+                    <!-- Dynamic class options -->
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <select class="form-select" id="student-status-filter">
+                    <option value="">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Students Table -->
+              <div class="table-responsive">
+                <table class="table table-hover align-middle" id="students-table">
+                  <thead class="table-light">
+                    <tr>
+                      <th><input type="checkbox" id="select-all-students"></th>
+                      <th>Photo</th>
+                      <th>Name</th>
+                      <th>ID</th>
+                      <th>Class</th>
+                      <th>Status</th>
+                      <th>Attendance %</th>
+                      <th>Fee Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Student rows will be dynamically inserted here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- Student Profile Modal -->
+            <div class="modal fade" id="studentProfileModal" tabindex="-1" aria-labelledby="studentProfileModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="studentProfileModalLabel">Student Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body" id="student-profile-body">
+                    <!-- Profile content will be dynamically loaded here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Add/Edit Student Modal -->
+            <div class="modal fade" id="addEditStudentModal" tabindex="-1" aria-labelledby="addEditStudentModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="addEditStudentModalLabel">Add/Edit Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body" id="add-edit-student-body">
+                    <!-- Add/Edit form will be dynamically loaded here -->
+                  </div>
+                </div>
+              </div>
+            </div>
             <div id="module-staff" class="module-section" style="display:none"><h2>Staff Module</h2></div>
             <div id="module-attendance" class="module-section" style="display:none"><h2>Attendance Module</h2></div>
             <div id="module-lesson-plans" class="module-section" style="display:none"><h2>Lesson Plans Module</h2></div>

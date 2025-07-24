@@ -63,68 +63,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Student Management UI ---
     function renderStudentManagement() {
-        setMainContent(`
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Student Management</h2>
-                <button class="btn btn-primary" id="addStudentBtn"><i class="bi bi-person-plus-fill me-2"></i>Add Student</button>
-            </div>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <input type="text" class="form-control table-search mb-3" placeholder="Search students..." id="studentSearchInput">
-                    <div class="table-responsive animate-fade-in">
-                        <table class="table table-striped align-middle" id="studentsTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Reg No</th>
-                                    <th>Name</th>
-                                    <th>Class</th>
-                                    <th>Fees</th>
-                                    <th>Attendance</th>
-                                    <th>Tests</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- Modal for Add/Edit Student -->
-            <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="studentModalLabel">Add Student</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <form id="studentForm">
-                      <div class="mb-3">
-                        <label for="studentRegNo" class="form-label">Reg No</label>
-                        <input type="text" class="form-control" id="studentRegNo" readonly>
-                      </div>
-                      <div class="mb-3">
-                        <label for="studentName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="studentName" required>
-                      </div>
-                      <div class="mb-3">
-                        <label for="studentClass" class="form-label">Class</label>
-                        <input type="text" class="form-control" id="studentClass" required>
-                      </div>
-                      <div class="mb-3">
-                        <label for="studentDocs" class="form-label">Attach Documents</label>
-                        <input type="file" class="form-control" id="studentDocs" multiple>
-                        <div class="form-text">Birth certificate, photo, report card, etc.</div>
-                      </div>
-                      <button type="submit" class="btn btn-primary w-100">Save</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-        `);
-        renderStudentsTable();
-        document.getElementById('addStudentBtn').onclick = openAddStudentModal;
+        // Hide all modules
+        document.querySelectorAll('.module-section').forEach(el => el.style.display = 'none');
+        // Show students module
+        const studentsModule = document.getElementById('module-students');
+        if (studentsModule) studentsModule.style.display = '';
+        // Optionally, reset filters/search
+        document.getElementById('student-search').value = '';
+        document.getElementById('student-class-filter').selectedIndex = 0;
+        document.getElementById('student-status-filter').selectedIndex = 0;
+        // Populate dashboard summary, table, etc. (to be implemented)
+        // Example: renderStudentsDashboard(); renderStudentsTable();
         // Reset badge and counter
         pendingStudentApplications = 0;
         updateSidebarStudentBadge();
@@ -4361,68 +4310,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // When students module is opened, clear the badge
     function renderStudentManagement() {
-        setMainContent(`
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Student Management</h2>
-                <button class="btn btn-primary" id="addStudentBtn"><i class="bi bi-person-plus-fill me-2"></i>Add Student</button>
-            </div>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <input type="text" class="form-control table-search mb-3" placeholder="Search students..." id="studentSearchInput">
-                    <div class="table-responsive animate-fade-in">
-                        <table class="table table-striped align-middle" id="studentsTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Reg No</th>
-                                    <th>Name</th>
-                                    <th>Class</th>
-                                    <th>Fees</th>
-                                    <th>Attendance</th>
-                                    <th>Tests</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- Modal for Add/Edit Student -->
-            <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="studentModalLabel">Add Student</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <form id="studentForm">
-                      <div class="mb-3">
-                        <label for="studentRegNo" class="form-label">Reg No</label>
-                        <input type="text" class="form-control" id="studentRegNo" readonly>
-                      </div>
-                      <div class="mb-3">
-                        <label for="studentName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="studentName" required>
-                      </div>
-                      <div class="mb-3">
-                        <label for="studentClass" class="form-label">Class</label>
-                        <input type="text" class="form-control" id="studentClass" required>
-                      </div>
-                      <div class="mb-3">
-                        <label for="studentDocs" class="form-label">Attach Documents</label>
-                        <input type="file" class="form-control" id="studentDocs" multiple>
-                        <div class="form-text">Birth certificate, photo, report card, etc.</div>
-                      </div>
-                      <button type="submit" class="btn btn-primary w-100">Save</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-        `);
-        renderStudentsTable();
-        document.getElementById('addStudentBtn').onclick = openAddStudentModal;
+        // Hide all modules
+        document.querySelectorAll('.module-section').forEach(el => el.style.display = 'none');
+        // Show students module
+        const studentsModule = document.getElementById('module-students');
+        if (studentsModule) studentsModule.style.display = '';
+        // Optionally, reset filters/search
+        document.getElementById('student-search').value = '';
+        document.getElementById('student-class-filter').selectedIndex = 0;
+        document.getElementById('student-status-filter').selectedIndex = 0;
+        // Populate dashboard summary, table, etc. (to be implemented)
+        // Example: renderStudentsDashboard(); renderStudentsTable();
         // Reset badge and counter
         pendingStudentApplications = 0;
         updateSidebarStudentBadge();
@@ -4487,4 +4385,478 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Dummy student data (Zimbabwean names, ZIG/USD)
+    const dummyStudents = [
+      {
+        id: 'STU001',
+        name: 'Tendai Moyo',
+        class: 'Grade 5',
+        status: 'active',
+        gender: 'Male',
+        attendance: 96,
+        feeStatus: 'Paid',
+        currency: 'ZIG',
+        photo: '',
+      },
+      {
+        id: 'STU002',
+        name: 'Rutendo Chikafu',
+        class: 'Grade 6',
+        status: 'active',
+        gender: 'Female',
+        attendance: 89,
+        feeStatus: 'Pending',
+        currency: 'USD',
+        photo: '',
+      },
+      {
+        id: 'STU003',
+        name: 'Kudakwashe Ncube',
+        class: 'Grade 5',
+        status: 'inactive',
+        gender: 'Male',
+        attendance: 72,
+        feeStatus: 'Overdue',
+        currency: 'ZIG',
+        photo: '',
+      },
+      {
+        id: 'STU004',
+        name: 'Nyasha Dube',
+        class: 'Grade 7',
+        status: 'active',
+        gender: 'Female',
+        attendance: 98,
+        feeStatus: 'Paid',
+        currency: 'USD',
+        photo: '',
+      },
+      {
+        id: 'STU005',
+        name: 'Simba Chirwa',
+        class: 'Grade 6',
+        status: 'active',
+        gender: 'Male',
+        attendance: 85,
+        feeStatus: 'Pending',
+        currency: 'ZIG',
+        photo: '',
+      },
+    ];
+
+    function renderStudentsDashboard(students) {
+      // Total students
+      document.getElementById('students-total-count').textContent = students.length;
+      // Gender ratio
+      const males = students.filter(s => s.gender === 'Male').length;
+      const females = students.filter(s => s.gender === 'Female').length;
+      document.getElementById('students-gender-ratio').textContent = `${males}M : ${females}F`;
+      // Classes
+      const classSet = new Set(students.map(s => s.class));
+      document.getElementById('students-class-count').textContent = classSet.size;
+      // Attendance summary (average)
+      const avgAttendance = students.length ? Math.round(students.reduce((a, s) => a + s.attendance, 0) / students.length) : 0;
+      document.getElementById('students-attendance-summary').textContent = avgAttendance + '%';
+    }
+
+    function renderStudentsTable(students) {
+      const tbody = document.querySelector('#students-table tbody');
+      tbody.innerHTML = '';
+      students.forEach(student => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="checkbox" class="student-row-checkbox"></td>
+          <td><div class="rounded-circle bg-secondary" style="width:32px;height:32px;"></div></td>
+          <td>${student.name}</td>
+          <td>${student.id}</td>
+          <td>${student.class}</td>
+          <td><span class="badge bg-${student.status === 'active' ? 'success' : 'secondary'}">${student.status.charAt(0).toUpperCase() + student.status.slice(1)}</span></td>
+          <td>${student.attendance}%</td>
+          <td><span class="badge bg-${student.feeStatus === 'Paid' ? 'success' : student.feeStatus === 'Pending' ? 'warning' : 'danger'}">${student.feeStatus} (${student.currency})</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline-info view-profile-btn" data-id="${student.id}"><i class="bi bi-person-lines-fill"></i></button>
+            <button class="btn btn-sm btn-outline-primary edit-student-btn" data-id="${student.id}"><i class="bi bi-pencil"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function setupAddStudentModal() {
+      document.getElementById('add-student-btn').onclick = function() {
+        // Show the Add/Edit Student modal
+        const modal = new bootstrap.Modal(document.getElementById('addEditStudentModal'));
+        // Populate modal body with a form
+        document.getElementById('add-edit-student-body').innerHTML = `
+          <form id="addStudentForm">
+            <div class="mb-3">
+              <label for="studentNameInput" class="form-label">Name</label>
+              <input type="text" class="form-control" id="studentNameInput" required>
+            </div>
+            <div class="mb-3">
+              <label for="studentClassInput" class="form-label">Class</label>
+              <input type="text" class="form-control" id="studentClassInput" required>
+            </div>
+            <div class="mb-3">
+              <label for="studentGenderInput" class="form-label">Gender</label>
+              <select class="form-select" id="studentGenderInput" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="studentAttendanceInput" class="form-label">Attendance (%)</label>
+              <input type="number" class="form-control" id="studentAttendanceInput" min="0" max="100" value="100" required>
+            </div>
+            <div class="mb-3">
+              <label for="studentFeeStatusInput" class="form-label">Fee Status</label>
+              <select class="form-select" id="studentFeeStatusInput" required>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Overdue">Overdue</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="studentCurrencyInput" class="form-label">Currency</label>
+              <select class="form-select" id="studentCurrencyInput" required>
+                <option value="ZIG">ZIG</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Add Student</button>
+          </form>
+        `;
+        // Handle form submission
+        document.getElementById('addStudentForm').onsubmit = function(e) {
+          e.preventDefault();
+          // For now, just close the modal and show a toast
+          modal.hide();
+          showToast('Student added (dummy, not saved)', 'success');
+        };
+        modal.show();
+      };
+    }
+
+    // Patch renderStudentManagement to call the new functions
+    const _origRenderStudentManagement = renderStudentManagement;
+    renderStudentManagement = function() {
+      // Call the original logic (show/hide section, reset filters)
+      _origRenderStudentManagement();
+      // Populate dashboard and table
+      renderStudentsDashboard(dummyStudents);
+      renderStudentsTable(dummyStudents);
+      setupAddStudentModal();
+    };
+
+    function setupStudentTableActions(students) {
+      // Edit button
+      document.querySelectorAll('.edit-student-btn').forEach(btn => {
+        btn.onclick = function() {
+          const studentId = this.getAttribute('data-id');
+          const student = students.find(s => s.id === studentId);
+          if (!student) return;
+          const modal = new bootstrap.Modal(document.getElementById('addEditStudentModal'));
+          document.getElementById('add-edit-student-body').innerHTML = `
+            <form id="editStudentForm">
+              <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" id="studentNameInput" value="${student.name}" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Class</label>
+                <input type="text" class="form-control" id="studentClassInput" value="${student.class}" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Gender</label>
+                <select class="form-select" id="studentGenderInput" required>
+                  <option value="">Select</option>
+                  <option value="Male" ${student.gender === 'Male' ? 'selected' : ''}>Male</option>
+                  <option value="Female" ${student.gender === 'Female' ? 'selected' : ''}>Female</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Attendance (%)</label>
+                <input type="number" class="form-control" id="studentAttendanceInput" min="0" max="100" value="${student.attendance}" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Fee Status</label>
+                <select class="form-select" id="studentFeeStatusInput" required>
+                  <option value="Paid" ${student.feeStatus === 'Paid' ? 'selected' : ''}>Paid</option>
+                  <option value="Pending" ${student.feeStatus === 'Pending' ? 'selected' : ''}>Pending</option>
+                  <option value="Overdue" ${student.feeStatus === 'Overdue' ? 'selected' : ''}>Overdue</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Currency</label>
+                <select class="form-select" id="studentCurrencyInput" required>
+                  <option value="ZIG" ${student.currency === 'ZIG' ? 'selected' : ''}>ZIG</option>
+                  <option value="USD" ${student.currency === 'USD' ? 'selected' : ''}>USD</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+            </form>
+          `;
+          document.getElementById('editStudentForm').onsubmit = function(e) {
+            e.preventDefault();
+            // Update dummy data
+            student.name = document.getElementById('studentNameInput').value;
+            student.class = document.getElementById('studentClassInput').value;
+            student.gender = document.getElementById('studentGenderInput').value;
+            student.attendance = parseInt(document.getElementById('studentAttendanceInput').value, 10);
+            student.feeStatus = document.getElementById('studentFeeStatusInput').value;
+            student.currency = document.getElementById('studentCurrencyInput').value;
+            modal.hide();
+            showToast('Student updated', 'success');
+            renderStudentsDashboard(dummyStudents);
+            renderStudentsTable(dummyStudents);
+            setupStudentTableActions(dummyStudents);
+          };
+          modal.show();
+        };
+      });
+      // View profile button
+      document.querySelectorAll('.view-profile-btn').forEach(btn => {
+        btn.onclick = function() {
+          const studentId = this.getAttribute('data-id');
+          const student = students.find(s => s.id === studentId);
+          if (!student) return;
+          const modal = new bootstrap.Modal(document.getElementById('studentProfileModal'));
+          document.getElementById('student-profile-body').innerHTML = `
+            <div class="row">
+              <div class="col-md-3 text-center">
+                <div class="rounded-circle bg-secondary mx-auto mb-2" style="width:80px;height:80px;"></div>
+                <div class="fw-bold">${student.name}</div>
+                <div class="text-muted">${student.id}</div>
+              </div>
+              <div class="col-md-9">
+                <dl class="row mb-0">
+                  <dt class="col-sm-4">Class</dt><dd class="col-sm-8">${student.class}</dd>
+                  <dt class="col-sm-4">Gender</dt><dd class="col-sm-8">${student.gender}</dd>
+                  <dt class="col-sm-4">Status</dt><dd class="col-sm-8"><span class="badge bg-${student.status === 'active' ? 'success' : 'secondary'}">${student.status.charAt(0).toUpperCase() + student.status.slice(1)}</span></dd>
+                  <dt class="col-sm-4">Attendance</dt><dd class="col-sm-8">${student.attendance}%</dd>
+                  <dt class="col-sm-4">Fee Status</dt><dd class="col-sm-8"><span class="badge bg-${student.feeStatus === 'Paid' ? 'success' : student.feeStatus === 'Pending' ? 'warning' : 'danger'}">${student.feeStatus} (${student.currency})</span></dd>
+                </dl>
+              </div>
+            </div>
+          `;
+          modal.show();
+        };
+      });
+    }
+
+    // Patch renderStudentsTable to also wire up actions
+    const _origRenderStudentsTable = renderStudentsTable;
+    renderStudentsTable = function(students) {
+      _origRenderStudentsTable(students);
+      setupStudentTableActions(students);
+    };
+
+    function generateStudentId() {
+      // Generate a unique ID like STU00X
+      let maxId = 0;
+      dummyStudents.forEach(s => {
+        const num = parseInt(s.id.replace('STU', ''), 10);
+        if (!isNaN(num) && num > maxId) maxId = num;
+      });
+      return 'STU' + String(maxId + 1).padStart(3, '0');
+    }
+
+    // Patch setupAddStudentModal to save new students
+    const _origSetupAddStudentModal = setupAddStudentModal;
+    setupAddStudentModal = function() {
+      document.getElementById('add-student-btn').onclick = function() {
+        const modal = new bootstrap.Modal(document.getElementById('addEditStudentModal'));
+        document.getElementById('add-edit-student-body').innerHTML = `
+          <form id="addStudentForm">
+            <div class="mb-3">
+              <label for="studentNameInput" class="form-label">Name</label>
+              <input type="text" class="form-control" id="studentNameInput" required>
+            </div>
+            <div class="mb-3">
+              <label for="studentClassInput" class="form-label">Class</label>
+              <input type="text" class="form-control" id="studentClassInput" required>
+            </div>
+            <div class="mb-3">
+              <label for="studentGenderInput" class="form-label">Gender</label>
+              <select class="form-select" id="studentGenderInput" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="studentAttendanceInput" class="form-label">Attendance (%)</label>
+              <input type="number" class="form-control" id="studentAttendanceInput" min="0" max="100" value="100" required>
+            </div>
+            <div class="mb-3">
+              <label for="studentFeeStatusInput" class="form-label">Fee Status</label>
+              <select class="form-select" id="studentFeeStatusInput" required>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Overdue">Overdue</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="studentCurrencyInput" class="form-label">Currency</label>
+              <select class="form-select" id="studentCurrencyInput" required>
+                <option value="ZIG">ZIG</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Add Student</button>
+          </form>
+        `;
+        document.getElementById('addStudentForm').onsubmit = function(e) {
+          e.preventDefault();
+          // Add new student to dummyStudents
+          const newStudent = {
+            id: generateStudentId(),
+            name: document.getElementById('studentNameInput').value,
+            class: document.getElementById('studentClassInput').value,
+            gender: document.getElementById('studentGenderInput').value,
+            attendance: parseInt(document.getElementById('studentAttendanceInput').value, 10),
+            feeStatus: document.getElementById('studentFeeStatusInput').value,
+            currency: document.getElementById('studentCurrencyInput').value,
+            status: 'active',
+            photo: '',
+          };
+          dummyStudents.push(newStudent);
+          modal.hide();
+          showToast('Student added', 'success');
+          renderStudentsDashboard(dummyStudents);
+          renderStudentsTable(dummyStudents);
+          setupStudentTableActions(dummyStudents);
+        };
+        modal.show();
+      };
+      // Optionally, add a button to add more dummy data for demo
+      if (document.getElementById('add-dummy-students-btn')) return;
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-outline-secondary ms-2';
+      btn.id = 'add-dummy-students-btn';
+      btn.innerHTML = '<i class="bi bi-person-plus"></i> Add Dummy Data';
+      document.querySelector('#module-students .d-flex .btn-group, #module-students .d-flex').appendChild(btn);
+      btn.onclick = function() {
+        const extra = [
+          { id: generateStudentId(), name: 'Farai Mutsvairo', class: 'Grade 4', status: 'active', gender: 'Male', attendance: 90, feeStatus: 'Paid', currency: 'USD', photo: '' },
+          { id: generateStudentId(), name: 'Chipo Mlambo', class: 'Grade 7', status: 'active', gender: 'Female', attendance: 95, feeStatus: 'Pending', currency: 'ZIG', photo: '' },
+          { id: generateStudentId(), name: 'Tatenda Sibanda', class: 'Grade 5', status: 'inactive', gender: 'Male', attendance: 60, feeStatus: 'Overdue', currency: 'USD', photo: '' },
+        ];
+        dummyStudents.push(...extra);
+        renderStudentsDashboard(dummyStudents);
+        renderStudentsTable(dummyStudents);
+        setupStudentTableActions(dummyStudents);
+        showToast('Dummy students added', 'info');
+      };
+    };
+
+    // --- Import Students ---
+    function setupImportStudents() {
+      const importBtn = document.getElementById('import-students-btn');
+      let fileInput = document.getElementById('import-students-input');
+      if (!fileInput) {
+        fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.csv';
+        fileInput.style.display = 'none';
+        fileInput.id = 'import-students-input';
+        importBtn.parentNode.appendChild(fileInput);
+      }
+      importBtn.onclick = () => fileInput.click();
+      fileInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const lines = evt.target.result.split(/\r?\n/);
+          // Expect header: name,class,gender,attendance,feeStatus,currency
+          for (let i = 1; i < lines.length; i++) {
+            const row = lines[i].split(',');
+            if (row.length < 6) continue;
+            dummyStudents.push({
+              id: generateStudentId(),
+              name: row[0],
+              class: row[1],
+              gender: row[2],
+              attendance: parseInt(row[3], 10) || 0,
+              feeStatus: row[4],
+              currency: row[5],
+              status: 'active',
+              photo: '',
+            });
+          }
+          renderStudentsDashboard(dummyStudents);
+          renderStudentsTable(dummyStudents);
+          setupStudentTableActions(dummyStudents);
+          showToast('Students imported', 'success');
+          fileInput.value = '';
+        };
+        reader.readAsText(file);
+      };
+    }
+
+    // --- Export Students ---
+    function setupExportStudents() {
+      document.getElementById('export-students-btn').onclick = function() {
+        let csv = 'name,class,gender,attendance,feeStatus,currency\n';
+        dummyStudents.forEach(s => {
+          csv += `${s.name},${s.class},${s.gender},${s.attendance},${s.feeStatus},${s.currency}\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'students.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Students exported', 'info');
+      };
+    }
+
+    // --- Bulk Message ---
+    function setupBulkMessage() {
+      document.getElementById('bulk-message-btn').onclick = function() {
+        // Get selected students
+        const selected = Array.from(document.querySelectorAll('.student-row-checkbox:checked'))
+          .map(cb => cb.closest('tr').querySelector('.view-profile-btn').getAttribute('data-id'));
+        if (selected.length === 0) {
+          showToast('No students selected', 'warning');
+          return;
+        }
+        // Compose message modal
+        const modal = new bootstrap.Modal(document.getElementById('addEditStudentModal'));
+        document.getElementById('add-edit-student-body').innerHTML = `
+          <form id="bulkMessageForm">
+            <div class="mb-3">
+              <label class="form-label">Message to ${selected.length} students</label>
+              <textarea class="form-control" id="bulkMessageText" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Send Message</button>
+          </form>
+        `;
+        document.getElementById('bulkMessageForm').onsubmit = function(e) {
+          e.preventDefault();
+          modal.hide();
+          showToast(`Message sent to: ${selected.map(id => dummyStudents.find(s => s.id === id)?.name).join(', ')}`, 'success');
+        };
+        modal.show();
+      };
+    }
+
+    // Patch renderStudentManagement to call new setups
+    const _origRenderStudentManagement2 = renderStudentManagement;
+    renderStudentManagement = function() {
+      _origRenderStudentManagement2();
+      renderStudentsDashboard(dummyStudents);
+      renderStudentsTable(dummyStudents);
+      setupStudentTableActions(dummyStudents);
+      setupAddStudentModal();
+      setupImportStudents();
+      setupExportStudents();
+      setupBulkMessage();
+    };
 }); 
